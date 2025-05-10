@@ -9,11 +9,20 @@ import (
 
 // checkCollision returns true if the dino and obstacle sprites overlap.
 func (g *Game) checkCollision() bool {
-	// Dino bounds
-	dW := len(dinoSprite[0])
-	dH := len(dinoSprite)
+	// Dino bounds based on current animation frame
+	var dSprite Sprite
+	onGround := int(g.dino.posY) == height-2
+	if !onGround {
+		// airborne: use first standing frame
+		dSprite = dinoStandFrames[0]
+	} else if g.dino.duckFrames > 0 {
+		dSprite = dinoDuckFrames[g.dino.animFrame]
+	} else {
+		dSprite = dinoStandFrames[g.dino.animFrame]
+	}
+	dW := len(dSprite[0])
+	dH := len(dSprite)
 	dX0 := g.dino.X
-	// current Dino vertical position
 	y := int(g.dino.posY)
 	dY0 := y - (dH - 1)
 	dX1 := g.dino.X + dW - 1
@@ -22,9 +31,9 @@ func (g *Game) checkCollision() bool {
 	// Obstacle bounds based on sprite
 	var oSprite Sprite
 	if g.obstacle.isBird {
-		oSprite = birdSprite
+		oSprite = birdFrames[g.obstacle.animFrame]
 	} else {
-		oSprite = obstacleSprite
+		oSprite = obstacleFrames[g.obstacle.animFrame]
 	}
 	oW := len(oSprite[0])
 	oH := len(oSprite)

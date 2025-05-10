@@ -46,35 +46,70 @@ const duckHoldDuration = fps - 11
 // 每帧间隔
 var tickDuration = time.Second / time.Duration(fps)
 
-// ASCII art sprite for the dinosaur
-
-var dinoSprite = Sprite{
-	" /oo\\  ",
-	"/|  |\\ ",
-	"  ||   ",
-	" /  \\  ",
+// Animation frames for standing Dino
+var dinoStandFrames = []Sprite{
+	{
+		"  __   ",
+		" /oo\\  ",
+		"/|  |\\ ",
+		"  ||   ",
+		" /  \\  ",
+	},
+	{
+		"  __   ",
+		" /oo\\  ",
+		"/|  |\\ ",
+		"  ||   ",
+		" \\  /  ",
+	},
 }
 
-// ASCII art sprite for the crouching dinosaur
-var dinoDuckSprite = Sprite{
-	"  _  ",
-	" /_\\ ",
-	"/___\\",
+// Animation frames for ducking Dino
+var dinoDuckFrames = []Sprite{
+	{
+		"  _  ",
+		" /_\\ ",
+		"/___\\",
+	},
+	{
+		"  +  ",
+		" /_\\ ",
+		"/___\\",
+	},
 }
 
-var obstacleSprite = Sprite{
-	" | ",
-	"/|\\",
-	" | ",
+// frames between animation switches
+const animPeriod = fps / 6
+
+// Animation frames for cactus obstacles
+var obstacleFrames = []Sprite{
+	{
+		" | ",
+		"/|\\",
+		" | ",
+	},
+	{
+		" | ",
+		"\\|/",
+		" | ",
+	},
+}
+
+// Animation frames for flying birds
+var birdFrames = []Sprite{
+	{
+		" <o> ",
+	},
+	{
+		" <O> ",
+	},
 }
 
 // bird appearance probability
 const birdProbability = 0.3
 
-// ASCII art sprite for the bird
-var birdSprite = Sprite{
-	" <o> ",
-}
+// bird flight height (row index) above bottom of screen
+const birdFlightRow = 10
 
 // Key bindings
 const (
