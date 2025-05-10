@@ -98,8 +98,11 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 				g.groundExtending = true
 			}
 			g.dino.Jump()
+			// cancel duck when jumping
+			g.dino.duckFrames = 0
 		case KeyDuck:
-			if g.started {
+			// only allow ducking when on ground
+			if g.started && int(g.dino.posY) == height-2 {
 				g.dino.duckFrames = duckHoldDuration
 			}
 		case KeyQuit:

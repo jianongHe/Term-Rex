@@ -40,9 +40,13 @@ func (d *Dino) Jump() {
 }
 
 // Draw renders the dino sprite at its current position
+// Draw renders the dino sprite at its current position
 func (d *Dino) Draw() {
 	var sprite Sprite
-	if d.drawingDuck {
+	// if airborne, always use standing sprite
+	if int(d.posY) != height-2 {
+		sprite = dinoSprite
+	} else if d.drawingDuck {
 		sprite = dinoDuckSprite
 	} else {
 		sprite = dinoSprite
