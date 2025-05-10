@@ -19,21 +19,15 @@ func (g *Game) checkCollision() bool {
 	dX0 := g.dino.X
 	dY0 := int(g.dino.posY) - (dH - 1)
 
-	// Determine Obstacle sprite and bounds
-	var oSprite Sprite
-	switch g.obstacle.obstacleType {
-	case Bird:
-		oSprite = birdFrames[g.obstacle.animFrame]
-	case BigBird:
-		oSprite = bigBirdFrames[g.obstacle.animFrame]
-	default: // Cactus
-		oSprite = obstacleFrames[g.obstacle.animFrame]
-	}
+	// Get obstacle sprite and position
+	obstacle := g.obstacleManager.GetCurrentObstacle()
+	oSprite := obstacle.GetSprite()
+	oX, oY := obstacle.GetPosition()
 
 	oW := len(oSprite[0])
 	oH := len(oSprite)
-	oX0 := int(math.Round(g.obstacle.posX))
-	oY0 := g.obstacle.Y - (oH - 1)
+	oX0 := int(math.Round(oX))
+	oY0 := oY - (oH - 1)
 
 	// Compute overlap rectangle
 	xStart := max(dX0, oX0)

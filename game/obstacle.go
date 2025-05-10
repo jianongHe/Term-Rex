@@ -10,96 +10,211 @@ import (
 type ObstacleType int
 
 const (
-	Cactus ObstacleType = iota
-	Bird
-	BigBird
+	CactusType ObstacleType = iota
+	BirdType
+	BigBirdType
 )
 
-// Obstacle moves across the screen
-type Obstacle struct {
-	posX         float64
-	Y            int
-	obstacleType ObstacleType
-	animFrame    int
-	animCounter  int
+// IObstacle defines the interface for all obstacle types
+type IObstacle interface {
+	Update()
+	Draw()
+	GetPosition() (float64, int)
+	SetPosition(x float64, y int)
+	Reset()
+	GetSprite() Sprite
 }
 
-func NewObstacle() *Obstacle {
-	o := &Obstacle{}
-	o.reset()
-	o.animFrame = 0
-	o.animCounter = 0
-	return o
+// BaseObstacle contains common properties and methods for all obstacles
+type BaseObstacle struct {
+	posX        float64
+	y           int
+	animFrame   int
+	animCounter int
 }
 
-func (o *Obstacle) reset() {
-	o.posX = float64(width - 1)
-
-	// Determine obstacle type based on probabilities
-	r := rand.Float64()
-	if r < bigBirdProbability {
-		o.obstacleType = BigBird
-		// place big bird at configurable flight height
-		o.Y = bigBirdFlightRow
-	} else if r < bigBirdProbability+birdProbability {
-		o.obstacleType = Bird
-		// place bird at configurable flight height
-		o.Y = birdFlightRow
-	} else {
-		o.obstacleType = Cactus
-		o.Y = height - 2
-	}
-
-	o.animFrame = 0
-	o.animCounter = 0
+// Update moves the obstacle and updates animation
+func (b *BaseObstacle) Update() {
+	b.posX -= obstacleSpeed
+	b.updateAnimation()
 }
 
-func (o *Obstacle) Update() {
-	o.posX -= obstacleSpeed
-	if o.posX < 0 {
-		o.reset()
-	}
-	o.updateAnimation()
+// GetPosition returns the current position of the obstacle
+func (b *BaseObstacle) GetPosition() (float64, int) {
+	return b.posX, b.y
 }
 
-func (o *Obstacle) Draw() {
-	var sprite Sprite
-	var fg termbox.Attribute
-
-	switch o.obstacleType {
-	case Bird:
-		sprite = birdFrames[o.animFrame]
-		fg = termbox.ColorYellow
-	case BigBird:
-		sprite = bigBirdFrames[o.animFrame]
-		fg = termbox.ColorMagenta
-	default: // Cactus
-		sprite = obstacleFrames[o.animFrame]
-		fg = termbox.ColorRed
-	}
-
-	h := len(sprite)
-	startY := o.Y - (h - 1)
-	x := int(math.Round(o.posX))
-	sprite.Draw(x, startY, fg, termbox.ColorDefault)
+// SetPosition sets the position of the obstacle
+func (b *BaseObstacle) SetPosition(x float64, y int) {
+	b.posX = x
+	b.y = y
 }
 
 // updateAnimation advances obstacle animation frames
-func (o *Obstacle) updateAnimation() {
-	o.animCounter++
-	if o.animCounter >= animPeriod {
-		o.animCounter = 0
-		var frameCount int
+func (b *BaseObstacle) updateAnimation() {
+	b.animCounter++
+	if b.animCounter >= animPeriod {
+		b.animCounter = 0
+		b.animFrame = (b.animFrame + 1) % b.getFrameCount()
+	}
+}
 
-		switch o.obstacleType {
-		case Bird:
-			frameCount = len(birdFrames)
-		case BigBird:
-			frameCount = len(bigBirdFrames)
-		default: // Cactus
-			frameCount = len(obstacleFrames)
-		}
+// Cactus represents a cactus obstacle
+type Cactus struct {
+	BaseObstacle
+}
 
-		o.animFrame = (o.animFrame + 1) % frameCount
+// NewCactus creates a new cactus obstacle
+func NewCactus() *Cactus {
+	c := &Cactus{}
+	c.Reset()
+	return c
+}
+
+// Reset resets the cactus position and animation
+func (c *Cactus) Reset() {
+	c.posX = float64(width - 1)
+	c.y = height - 2
+	c.animFrame = 0
+	c.animCounter = 0
+}
+
+// Draw renders the cactus on screen
+func (c *Cactus) Draw() {
+	sprite := obstacleFrames[c.animFrame]
+	h := len(sprite)
+	startY := c.y - (h - 1)
+	x := int(math.Round(c.posX))
+	sprite.Draw(x, startY, termbox.ColorRed, termbox.ColorDefault)
+}
+
+// GetSprite returns the current sprite for collision detection
+func (c *Cactus) GetSprite() Sprite {
+	return obstacleFrames[c.animFrame]
+}
+
+// getFrameCount returns the number of animation frames
+func (c *BaseObstacle) getFrameCount() int {
+	return len(obstacleFrames)
+}
+
+// Bird represents a small bird obstacle
+type Bird struct {
+	BaseObstacle
+}
+
+// NewBird creates a new bird obstacle
+func NewBird() *Bird {
+	b := &Bird{}
+	b.Reset()
+	return b
+}
+
+// Reset resets the bird position and animation
+func (b *Bird) Reset() {
+	b.posX = float64(width - 1)
+	b.y = birdFlightRow
+	b.animFrame = 0
+	b.animCounter = 0
+}
+
+// Draw renders the bird on screen
+func (b *Bird) Draw() {
+	sprite := birdFrames[b.animFrame]
+	h := len(sprite)
+	startY := b.y - (h - 1)
+	x := int(math.Round(b.posX))
+	sprite.Draw(x, startY, termbox.ColorYellow, termbox.ColorDefault)
+}
+
+// GetSprite returns the current sprite for collision detection
+func (b *Bird) GetSprite() Sprite {
+	return birdFrames[b.animFrame]
+}
+
+// getFrameCount returns the number of animation frames
+func (b *Bird) getFrameCount() int {
+	return len(birdFrames)
+}
+
+// BigBird represents a large bird obstacle
+type BigBird struct {
+	BaseObstacle
+}
+
+// NewBigBird creates a new big bird obstacle
+func NewBigBird() *BigBird {
+	b := &BigBird{}
+	b.Reset()
+	return b
+}
+
+// Reset resets the big bird position and animation
+func (b *BigBird) Reset() {
+	b.posX = float64(width - 1)
+	b.y = bigBirdFlightRow
+	b.animFrame = 0
+	b.animCounter = 0
+}
+
+// Draw renders the big bird on screen
+func (b *BigBird) Draw() {
+	sprite := bigBirdFrames[b.animFrame]
+	h := len(sprite)
+	startY := b.y - (h - 1)
+	x := int(math.Round(b.posX))
+	sprite.Draw(x, startY, termbox.ColorMagenta, termbox.ColorDefault)
+}
+
+// GetSprite returns the current sprite for collision detection
+func (b *BigBird) GetSprite() Sprite {
+	return bigBirdFrames[b.animFrame]
+}
+
+// getFrameCount returns the number of animation frames
+func (b *BigBird) getFrameCount() int {
+	return len(bigBirdFrames)
+}
+
+// ObstacleManager manages the creation and updating of obstacles
+type ObstacleManager struct {
+	currentObstacle IObstacle
+}
+
+// NewObstacleManager creates a new obstacle manager
+func NewObstacleManager() *ObstacleManager {
+	om := &ObstacleManager{}
+	om.generateNewObstacle()
+	return om
+}
+
+// Update updates the current obstacle and generates a new one if needed
+func (om *ObstacleManager) Update() {
+	om.currentObstacle.Update()
+	x, _ := om.currentObstacle.GetPosition()
+	if x < 0 {
+		om.generateNewObstacle()
+	}
+}
+
+// Draw renders the current obstacle
+func (om *ObstacleManager) Draw() {
+	om.currentObstacle.Draw()
+}
+
+// GetCurrentObstacle returns the current active obstacle
+func (om *ObstacleManager) GetCurrentObstacle() IObstacle {
+	return om.currentObstacle
+}
+
+// generateNewObstacle creates a new obstacle based on probabilities
+func (om *ObstacleManager) generateNewObstacle() {
+	r := rand.Float64()
+	if r < bigBirdProbability {
+		om.currentObstacle = NewBigBird()
+	} else if r < bigBirdProbability+birdProbability {
+		om.currentObstacle = NewBird()
+	} else {
+		om.currentObstacle = NewCactus()
 	}
 }

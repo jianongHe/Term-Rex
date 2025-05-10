@@ -12,7 +12,7 @@ func (g *Game) update() {
 	g.dino.Update()
 	if g.started {
 		g.applyStage()
-		g.obstacle.Update()
+		g.obstacleManager.Update()
 		if g.checkCollision() {
 			g.collided = true
 		}
@@ -40,7 +40,7 @@ func (g *Game) gameOver() {
 				}
 				// reset game state
 				g.dino = NewDino()
-				g.obstacle = NewObstacle()
+				g.obstacleManager = NewObstacleManager()
 				g.score = 0
 				// reset stage progression and parameters
 				g.stageIndexActive = 0

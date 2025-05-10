@@ -15,7 +15,7 @@ func SetWidth(w int) {
 // Game holds all state
 type Game struct {
 	dino                 *Dino
-	obstacle             *Obstacle
+	obstacleManager      *ObstacleManager
 	ticker               *time.Ticker
 	events               chan termbox.Event
 	score                int
@@ -52,7 +52,7 @@ func NewGame() *Game {
 	}
 	return &Game{
 		dino:                 d,
-		obstacle:             NewObstacle(),
+		obstacleManager:      NewObstacleManager(),
 		ticker:               time.NewTicker(tickDuration),
 		events:               events,
 		score:                0,
@@ -85,9 +85,11 @@ func (g *Game) drawGameScene() {
 	// dino
 	g.dino.Draw()
 	// obstacle
-	xPos := int(math.Round(g.obstacle.posX))
+	obstacle := g.obstacleManager.GetCurrentObstacle()
+	x, _ := obstacle.GetPosition()
+	xPos := int(math.Round(x))
 	if xPos >= g.groundStart && xPos <= g.groundEnd {
-		g.obstacle.Draw()
+		g.obstacleManager.Draw()
 	}
 }
 
