@@ -30,6 +30,21 @@ func (g *Game) update() {
 
 // gameOver displays game over screen and waits for restart or quit
 func (g *Game) gameOver() {
+	// 播放碰撞音效
+	GetAudioManager().PlaySound(SoundCollision)
+
+	// 更新最高分并保存
+	if g.score > g.highestScore {
+		g.highestScore = g.score
+		// 保存最高分到文件
+		err := SaveHighScore(g.highestScore)
+		if err != nil {
+			// 如果保存失败，只在控制台打印错误，不影响游戏
+			// 这里不能直接显示在游戏界面，因为会干扰游戏结束画面
+			// fmt.Println("无法保存最高分:", err)
+		}
+	}
+
 	PrintCenter("GAME OVER (r to retry, q to quit)")
 
 	// 显示音效控制提示
@@ -44,10 +59,6 @@ func (g *Game) gameOver() {
 		ev := <-g.events
 		if ev.Type == termbox.EventKey {
 			if ev.Ch == KeyRestartRune {
-				// update highest score
-				if g.score > g.highestScore {
-					g.highestScore = g.score
-				}
 				// reset game state
 				g.dino = NewDino()
 				g.obstacleManager = NewObstacleManager()

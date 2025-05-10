@@ -62,6 +62,14 @@ func NewGame() *Game {
 	// Initialize ground decorations
 	InitGroundDecorations()
 
+	// 加载历史最高分
+	highScore, err := LoadHighScore()
+	if err != nil {
+		// 如果加载失败，使用默认值0
+		fmt.Println("无法加载最高分:", err)
+		highScore = 0
+	}
+
 	return &Game{
 		dino:                 d,
 		obstacleManager:      NewObstacleManager(),
@@ -69,6 +77,7 @@ func NewGame() *Game {
 		ticker:               time.NewTicker(tickDuration),
 		events:               events,
 		score:                0,
+		highestScore:         highScore,
 		groundStart:          gs,
 		groundEnd:            ge,
 		started:              false,
