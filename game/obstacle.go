@@ -11,6 +11,7 @@ type ObstacleType int
 
 const (
 	CactusType ObstacleType = iota
+	GroupCactusType
 	BirdType
 	BigBirdType
 )
@@ -214,7 +215,48 @@ func (om *ObstacleManager) generateNewObstacle() {
 		om.currentObstacle = NewBigBird()
 	} else if r < bigBirdProbability+birdProbability {
 		om.currentObstacle = NewBird()
+	} else if r < bigBirdProbability+birdProbability+groupCactusProbability {
+		om.currentObstacle = NewGroupCactus()
 	} else {
 		om.currentObstacle = NewCactus()
 	}
+}
+
+// GroupCactus represents a group of connected cacti obstacle
+type GroupCactus struct {
+	BaseObstacle
+}
+
+// NewGroupCactus creates a new group cactus obstacle
+func NewGroupCactus() *GroupCactus {
+	c := &GroupCactus{}
+	c.Reset()
+	return c
+}
+
+// Reset resets the group cactus position and animation
+func (c *GroupCactus) Reset() {
+	c.posX = float64(width - 1)
+	c.y = height - 2
+	c.animFrame = 0
+	c.animCounter = 0
+}
+
+// Draw renders the group cactus on screen
+func (c *GroupCactus) Draw() {
+	sprite := groupCactusFrames[c.animFrame]
+	h := len(sprite)
+	startY := c.y - (h - 1)
+	x := int(math.Round(c.posX))
+	sprite.Draw(x, startY, termbox.ColorRed, termbox.ColorDefault)
+}
+
+// GetSprite returns the current sprite for collision detection
+func (c *GroupCactus) GetSprite() Sprite {
+	return groupCactusFrames[c.animFrame]
+}
+
+// getFrameCount returns the number of animation frames
+func (c *GroupCactus) getFrameCount() int {
+	return len(groupCactusFrames)
 }

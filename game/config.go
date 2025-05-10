@@ -83,7 +83,7 @@ var dinoDuckFrames = []Sprite{
 // frames between animation switches
 const animPeriod = fps / 6
 
-// Animation frames for cactus obstacles
+// Animation frames for single cactus obstacles
 var obstacleFrames = []Sprite{
 	{
 		" | ",
@@ -94,6 +94,20 @@ var obstacleFrames = []Sprite{
 		" | ",
 		"\\|/",
 		" | ",
+	},
+}
+
+// Animation frames for group cactus obstacles
+var groupCactusFrames = []Sprite{
+	{
+		" |    ",
+		"/|\\/|\\",
+		" |  |",
+	},
+	{
+		" |    ",
+		"\\|//|\\",
+		" |  |",
 	},
 }
 
@@ -192,17 +206,18 @@ const cloudBufferSpace = 5
 
 // StageConfig defines dynamic game parameters per stage based on score.
 type StageConfig struct {
-	ScoreThreshold int     // minimum score to enter this stage
-	Speed          float64 // obstacleSpeed for this stage
-	BirdProb       float64 // birdProbability for this stage
-	BigBirdProb    float64 // bigBirdProbability for this stage
+	ScoreThreshold  int     // minimum score to enter this stage
+	Speed           float64 // obstacleSpeed for this stage
+	BirdProb        float64 // birdProbability for this stage
+	BigBirdProb     float64 // bigBirdProbability for this stage
+	GroupCactusProb float64 // groupCactusProbability for this stage
 }
 
 // stageConfigs lists the stages in ascending order of score threshold.
 var stageConfigs = []StageConfig{
-	{ScoreThreshold: 0, Speed: 1.4, BirdProb: 0.1, BigBirdProb: 0.05},
-	{ScoreThreshold: 300, Speed: 2.0, BirdProb: 0.3, BigBirdProb: 0.1},
-	{ScoreThreshold: 1000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2},
+	{ScoreThreshold: 0, Speed: 1.4, BirdProb: 0.1, BigBirdProb: 0.05, GroupCactusProb: 0.15},
+	{ScoreThreshold: 300, Speed: 2.0, BirdProb: 0.3, BigBirdProb: 0.1, GroupCactusProb: 0.25},
+	{ScoreThreshold: 1000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
 }
 
 // duration of smooth transition between stages
@@ -222,3 +237,6 @@ const (
 	// restart game
 	KeyRestartRune = 'r'
 )
+
+// group cactus appearance probability (default value, will be overridden by stage config)
+var groupCactusProbability = 0.25
