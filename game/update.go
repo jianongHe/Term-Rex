@@ -34,6 +34,10 @@ func (g *Game) gameOver() {
 		ev := <-g.events
 		if ev.Type == termbox.EventKey {
 			if ev.Ch == KeyRestartRune {
+				// update highest score
+				if g.score > g.highestScore {
+					g.highestScore = g.score
+				}
 				// reset game state
 				g.dino = NewDino()
 				g.obstacle = NewObstacle()

@@ -19,6 +19,7 @@ type Game struct {
 	ticker               *time.Ticker
 	events               chan termbox.Event
 	score                int
+	highestScore         int
 	groundStart          int
 	groundEnd            int
 	started              bool
@@ -94,6 +95,11 @@ func (g *Game) draw() {
 	ClearScreen()
 	// score and quit hint
 	PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
+	if g.highestScore > 0 {
+		hsText := fmt.Sprintf("High: %d", g.highestScore)
+		x := width - len(hsText)
+		PrintAt(x, 0, hsText)
+	}
 	if !g.started {
 		g.drawStartScreen()
 		termbox.Flush()
