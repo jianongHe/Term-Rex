@@ -16,6 +16,17 @@ func (g *Game) applyStage() {
 	if target != g.stageIndexTarget {
 		g.stageIndexTarget = target
 		g.stageTransitionStart = time.Now()
+
+		// 当进入新阶段时，触发分数闪烁效果
+		if target > g.stageIndexActive {
+			g.scoreBlinking = true
+			g.scoreBlinkStart = time.Now()
+			g.scoreBlinkVisible = true
+			g.lastBlinkToggle = time.Now()
+
+			// 播放得分音效
+			GetAudioManager().PlaySound(SoundScore)
+		}
 	}
 	// if currently transitioning between two stages
 	if g.stageIndexActive != g.stageIndexTarget {

@@ -52,6 +52,12 @@ const (
 	ScoreMilestone = 100  // 每得到100分播放一次得分音效
 )
 
+// 分数闪烁相关配置
+const (
+	ScoreBlinkDuration = 1500 * time.Millisecond // 分数闪烁持续时间（1.5秒）
+	ScoreBlinkInterval = 200 * time.Millisecond  // 分数闪烁间隔（200毫秒）
+)
+
 // Animation frames for standing Dino
 var dinoStandFrames = []Sprite{
 	{
@@ -222,8 +228,14 @@ type StageConfig struct {
 // stageConfigs lists the stages in ascending order of score threshold.
 var stageConfigs = []StageConfig{
 	{ScoreThreshold: 0, Speed: 1.4, BirdProb: 0.1, BigBirdProb: 0.05, GroupCactusProb: 0.15},
+	{ScoreThreshold: 100, Speed: 1.4, BirdProb: 0.1, BigBirdProb: 0.05, GroupCactusProb: 0.15},
 	{ScoreThreshold: 300, Speed: 2.0, BirdProb: 0.3, BigBirdProb: 0.1, GroupCactusProb: 0.25},
+	{ScoreThreshold: 600, Speed: 2.0, BirdProb: 0.3, BigBirdProb: 0.1, GroupCactusProb: 0.25},
 	{ScoreThreshold: 1000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
+	{ScoreThreshold: 1500, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
+	{ScoreThreshold: 2000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
+	{ScoreThreshold: 2500, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
+	{ScoreThreshold: 3000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
 }
 
 // duration of smooth transition between stages

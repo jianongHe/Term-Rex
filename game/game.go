@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/nsf/termbox-go"
 	"math"
+	"strings"
 	"time"
 )
 
@@ -31,6 +32,10 @@ type Game struct {
 	stageIndexActive     int
 	stageIndexTarget     int
 	stageTransitionStart time.Time
+	scoreBlinking        bool      // 标记分数是否正在闪烁
+	scoreBlinkStart      time.Time // 分数开始闪烁的时间
+	scoreBlinkVisible    bool      // 控制分数闪烁的显示/隐藏状态
+	lastBlinkToggle      time.Time // 上次闪烁状态切换的时间
 }
 
 // NewGame initializes and returns a new Game
@@ -71,6 +76,10 @@ func NewGame() *Game {
 		stageIndexActive:     0,
 		stageIndexTarget:     0,
 		stageTransitionStart: time.Time{},
+		scoreBlinking:        false,
+		scoreBlinkStart:      time.Time{},
+		scoreBlinkVisible:    true,
+		lastBlinkToggle:      time.Time{},
 	}
 }
 
@@ -122,8 +131,33 @@ func (g *Game) drawGameScene() {
 // draw renders the current game state
 func (g *Game) draw() {
 	ClearScreen()
+
+	// 处理分数闪烁逻辑
+	if g.scoreBlinking {
+		elapsed := time.Since(g.scoreBlinkStart)
+
+		// 检查是否需要结束闪烁
+		if elapsed >= ScoreBlinkDuration {
+			g.scoreBlinking = false
+			g.scoreBlinkVisible = true
+		} else {
+			// 检查是否需要切换闪烁状态
+			if time.Since(g.lastBlinkToggle) >= ScoreBlinkInterval {
+				g.scoreBlinkVisible = !g.scoreBlinkVisible
+				g.lastBlinkToggle = time.Now()
+			}
+		}
+	}
+
 	// score and quit hint
-	PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
+	if g.scoreBlinking && !g.scoreBlinkVisible {
+		// 闪烁状态下，用空格替换分数的每一位，保持原有位数
+		scoreStr := fmt.Sprintf("%d", g.score)
+		blankScore := strings.Repeat(" ", len(scoreStr))
+		PrintAt(0, 0, fmt.Sprintf("Score: %s  (q to quit)", blankScore))
+	} else {
+		PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
+	}
 
 	// 显示音效状态
 	soundStatus := "Sound: ON (m)"
@@ -170,12 +204,15 @@ func (g *Game) Run() {
 			continue
 		}
 		if g.started {
-			g.score++
+			// 只有在分数不闪烁时才增加分数
+			if !g.scoreBlinking {
+				g.score++
 
-			// 每得到100分播放一次得分音效
-			if g.score/ScoreMilestone > lastScoreMilestone {
-				lastScoreMilestone = g.score / ScoreMilestone
-				GetAudioManager().PlaySound(SoundScore)
+				// 每得到100分播放一次得分音效
+				if g.score/ScoreMilestone > lastScoreMilestone {
+					lastScoreMilestone = g.score / ScoreMilestone
+					GetAudioManager().PlaySound(SoundScore)
+				}
 			}
 		}
 		g.draw()
