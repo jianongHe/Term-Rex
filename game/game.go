@@ -19,9 +19,15 @@ func (g *Game) checkCollision() bool {
 	dX1 := g.dino.X + dW - 1
 	dY1 := y
 
-	// Obstacle bounds
-	oW := len(obstacleSprite[0])
-	oH := len(obstacleSprite)
+	// Obstacle bounds based on sprite
+	var oSprite Sprite
+	if g.obstacle.isBird {
+		oSprite = birdSprite
+	} else {
+		oSprite = obstacleSprite
+	}
+	oW := len(oSprite[0])
+	oH := len(oSprite)
 	oX0 := g.obstacle.X
 	oY0 := g.obstacle.Y - (oH - 1)
 	oX1 := g.obstacle.X + oW - 1
@@ -92,6 +98,10 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 				g.groundExtending = true
 			}
 			g.dino.Jump()
+		case KeyDuck:
+			if g.started {
+				g.dino.duckFrames = duckHoldDuration
+			}
 		case KeyQuit:
 			return false
 		}

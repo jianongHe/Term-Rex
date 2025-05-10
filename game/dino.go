@@ -4,10 +4,12 @@ import "github.com/nsf/termbox-go"
 
 // Dino represents the player character with smooth jump physics
 type Dino struct {
-	X          int
-	posY       float64
-	velY       float64
-	hangFrames int
+	X           int
+	posY        float64
+	velY        float64
+	hangFrames  int
+	duckFrames  int
+	drawingDuck bool
 }
 
 // NewDino creates a new Dino at the ground position
@@ -17,6 +19,12 @@ func NewDino() *Dino {
 
 // Update advances the dino's position with smooth jump and hang time
 func (d *Dino) Update() {
+	// handle duck hold
+	if d.duckFrames > 0 {
+		d.duckFrames--
+	}
+	d.drawingDuck = d.duckFrames > 0
+
 	if d.shouldUpdate() {
 		d.applyPhysics()
 		d.checkLanding()
@@ -33,10 +41,16 @@ func (d *Dino) Jump() {
 
 // Draw renders the dino sprite at its current position
 func (d *Dino) Draw() {
-	h := len(dinoSprite)
+	var sprite Sprite
+	if d.drawingDuck {
+		sprite = dinoDuckSprite
+	} else {
+		sprite = dinoSprite
+	}
+	h := len(sprite)
 	y := int(d.posY)
 	startY := y - (h - 1)
-	dinoSprite.Draw(d.X, startY, termbox.ColorGreen, termbox.ColorDefault)
+	sprite.Draw(d.X, startY, termbox.ColorGreen, termbox.ColorDefault)
 }
 
 // shouldUpdate returns true if the dino is airborne or hanging

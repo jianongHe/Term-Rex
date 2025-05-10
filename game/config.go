@@ -40,11 +40,23 @@ const groundExtendSpeed = 3
 // initial ground length in cells (total width)
 const initialGroundLength = 6
 
+// duck hold duration in frames
+const duckHoldDuration = fps - 11
+
 // 每帧间隔
 var tickDuration = time.Second / time.Duration(fps)
 
 // ASCII art sprite for the dinosaur
+
 var dinoSprite = Sprite{
+	" /oo\\  ",
+	"/|  |\\ ",
+	"  ||   ",
+	" /  \\  ",
+}
+
+// ASCII art sprite for the crouching dinosaur
+var dinoDuckSprite = Sprite{
 	"  _  ",
 	" /_\\ ",
 	"/___\\",
@@ -56,11 +68,20 @@ var obstacleSprite = Sprite{
 	" | ",
 }
 
+// bird appearance probability
+const birdProbability = 0.3
+
+// ASCII art sprite for the bird
+var birdSprite = Sprite{
+	" <o> ",
+}
+
 // Key bindings
 const (
-	KeyJump    = termbox.KeySpace   // jump action
-	KeyJumpAlt = termbox.KeyArrowUp // alternate jump action
-	KeyQuit    = termbox.KeyEsc     // quit action
+	KeyJump    = termbox.KeySpace     // jump action
+	KeyJumpAlt = termbox.KeyArrowUp   // alternate jump action
+	KeyDuck    = termbox.KeyArrowDown // duck action
+	KeyQuit    = termbox.KeyEsc       // quit action
 )
 
 // Character key bindings
