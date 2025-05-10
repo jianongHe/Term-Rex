@@ -11,9 +11,11 @@ func (g *Game) checkCollision() bool {
 	dW := len(dinoSprite[0])
 	dH := len(dinoSprite)
 	dX0 := g.dino.X
-	dY0 := g.dino.Y - (dH - 1)
+	// current Dino vertical position
+	y := int(g.dino.posY)
+	dY0 := y - (dH - 1)
 	dX1 := g.dino.X + dW - 1
-	dY1 := g.dino.Y
+	dY1 := y
 
 	// Obstacle bounds
 	oW := len(obstacleSprite[0])
@@ -26,12 +28,6 @@ func (g *Game) checkCollision() bool {
 	// Check for intersection
 	return !(dX1 < oX0 || oX1 < dX0 || dY1 < oY0 || oY1 < dY0)
 }
-
-var (
-	width  = 50
-	height = 10
-	fps    = 24
-)
 
 // SetWidth updates game width based on terminal size
 func SetWidth(w int) {
@@ -57,7 +53,7 @@ func NewGame() *Game {
 	return &Game{
 		dino:     NewDino(),
 		obstacle: NewObstacle(),
-		ticker:   time.NewTicker(time.Second / time.Duration(fps)),
+		ticker:   time.NewTicker(tickDuration),
 		events:   events,
 	}
 }
@@ -66,12 +62,12 @@ func NewGame() *Game {
 func (g *Game) handleEvent(ev termbox.Event) bool {
 	if ev.Type == termbox.EventKey {
 		switch ev.Key {
-		case termbox.KeySpace:
+		case KeyJump:
 			g.dino.Jump()
-		case termbox.KeyEsc:
+		case KeyQuit:
 			return false
 		}
-		if ev.Ch == 'q' {
+		if ev.Ch == KeyQuitRune {
 			return false
 		}
 	}

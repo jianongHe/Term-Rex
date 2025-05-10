@@ -12,16 +12,10 @@ func NewObstacle() *Obstacle {
 }
 
 func (o *Obstacle) Update() {
-	o.X--
+	o.X -= obstacleSpeed
 	if o.X < 0 {
 		o.X = width - 1
 	}
-}
-
-var obstacleSprite = Sprite{
-	" | ",
-	"/|\\",
-	" | ",
 }
 
 func (o *Obstacle) Draw() {
