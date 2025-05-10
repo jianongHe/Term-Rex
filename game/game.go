@@ -38,11 +38,15 @@ func SetWidth(w int) {
 
 // Game holds all state
 type Game struct {
-	dino     *Dino
-	obstacle *Obstacle
-	ticker   *time.Ticker
-	events   chan termbox.Event
-	score    int
+	dino            *Dino
+	obstacle        *Obstacle
+	ticker          *time.Ticker
+	events          chan termbox.Event
+	score           int
+	groundStart     int
+	groundEnd       int
+	started         bool
+	groundExtending bool
 }
 
 // NewGame initializes and returns a new Game
@@ -53,12 +57,28 @@ func NewGame() *Game {
 			events <- termbox.PollEvent()
 		}
 	}()
+	// initialize player
+	d := NewDino()
+	// calculate initial ground boundaries
+	half := initialGroundLength / 2
+	gs := d.X - half
+	if gs < 0 {
+		gs = 0
+	}
+	ge := d.X + half
+	if ge > width-1 {
+		ge = width - 1
+	}
 	return &Game{
-		dino:     NewDino(),
-		obstacle: NewObstacle(),
-		ticker:   time.NewTicker(tickDuration),
-		events:   events,
-		score:    0,
+		dino:            d,
+		obstacle:        NewObstacle(),
+		ticker:          time.NewTicker(tickDuration),
+		events:          events,
+		score:           0,
+		groundStart:     gs,
+		groundEnd:       ge,
+		started:         false,
+		groundExtending: false,
 	}
 }
 
@@ -66,7 +86,11 @@ func NewGame() *Game {
 func (g *Game) handleEvent(ev termbox.Event) bool {
 	if ev.Type == termbox.EventKey {
 		switch ev.Key {
-		case KeyJump:
+		case KeyJump, KeyJumpAlt:
+			if !g.started {
+				g.started = true
+				g.groundExtending = true
+			}
 			g.dino.Jump()
 		case KeyQuit:
 			return false
@@ -81,9 +105,18 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 // update updates game state
 func (g *Game) update() {
 	g.dino.Update()
-	g.obstacle.Update()
-	if g.checkCollision() {
-		g.gameOver()
+	if g.started {
+		g.obstacle.Update()
+		if g.checkCollision() {
+			g.gameOver()
+		}
+		if g.groundExtending {
+			g.updateGround()
+			// stop extending once ground fully spans screen
+			if g.groundStart == 0 && g.groundEnd == width-1 {
+				g.groundExtending = false
+			}
+		}
 	}
 }
 
@@ -92,9 +125,12 @@ func (g *Game) draw() {
 	ClearScreen()
 	// display score and quit hint
 	PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
-	DrawGround()
+	g.drawGround()
 	g.dino.Draw()
-	g.obstacle.Draw()
+	// only draw obstacle if it is on extended ground
+	if g.obstacle.X >= g.groundStart && g.obstacle.X <= g.groundEnd {
+		g.obstacle.Draw()
+	}
 	termbox.Flush()
 }
 
@@ -109,7 +145,9 @@ func (g *Game) Run() {
 		default:
 		}
 		g.update()
-		g.score++
+		if g.started {
+			g.score++
+		}
 		g.draw()
 	}
 }
@@ -134,5 +172,28 @@ func (g *Game) gameOver() {
 				os.Exit(0)
 			}
 		}
+	}
+}
+
+// updateGround expands the ground boundaries until filling the screen.
+func (g *Game) updateGround() {
+	if g.groundStart > 0 {
+		g.groundStart -= groundExtendSpeed
+		if g.groundStart < 0 {
+			g.groundStart = 0
+		}
+	}
+	if g.groundEnd < width-1 {
+		g.groundEnd += groundExtendSpeed
+		if g.groundEnd > width-1 {
+			g.groundEnd = width - 1
+		}
+	}
+}
+
+// drawGround draws ground only between the current boundaries.
+func (g *Game) drawGround() {
+	for x := g.groundStart; x <= g.groundEnd; x++ {
+		termbox.SetCell(x, height-1, '_', termbox.ColorWhite, termbox.ColorDefault)
 	}
 }

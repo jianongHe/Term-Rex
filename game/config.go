@@ -11,7 +11,7 @@ import (
 var width = 80
 
 // 固定游戏高度（行数）
-const height = 10
+const height = 15
 
 // 帧率（FPS）
 const fps = 24
@@ -34,6 +34,12 @@ const hangDuration = 2
 // 障碍物每帧移动的格数
 const obstacleSpeed = 1
 
+// ground extension speed in cells per frame
+const groundExtendSpeed = 3
+
+// initial ground length in cells (total width)
+const initialGroundLength = 6
+
 // 每帧间隔
 var tickDuration = time.Second / time.Duration(fps)
 
@@ -52,8 +58,9 @@ var obstacleSprite = Sprite{
 
 // Key bindings
 const (
-	KeyJump = termbox.KeySpace // jump action
-	KeyQuit = termbox.KeyEsc   // quit action
+	KeyJump    = termbox.KeySpace   // jump action
+	KeyJumpAlt = termbox.KeyArrowUp // alternate jump action
+	KeyQuit    = termbox.KeyEsc     // quit action
 )
 
 // Character key bindings
