@@ -11,6 +11,11 @@ var (
 	fps    = 24
 )
 
+// SetWidth updates game width based on terminal size
+func SetWidth(w int) {
+	width = w
+}
+
 // Game holds all state
 type Game struct {
 	dino     *Dino
@@ -19,6 +24,7 @@ type Game struct {
 	events   chan termbox.Event
 }
 
+// NewGame initializes and returns a new Game
 func NewGame() *Game {
 	events := make(chan termbox.Event)
 	go func() {
@@ -29,11 +35,12 @@ func NewGame() *Game {
 	return &Game{
 		dino:     NewDino(),
 		obstacle: NewObstacle(),
-		ticker:   time.NewTicker(time.Second / fps),
+		ticker:   time.NewTicker(time.Second / time.Duration(fps)),
 		events:   events,
 	}
 }
 
+// handleEvent processes a single input event
 func (g *Game) handleEvent(ev termbox.Event) bool {
 	if ev.Type == termbox.EventKey {
 		switch ev.Key {
@@ -49,6 +56,7 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 	return true
 }
 
+// update updates game state
 func (g *Game) update() {
 	g.dino.Update()
 	g.obstacle.Update()
@@ -57,6 +65,7 @@ func (g *Game) update() {
 	}
 }
 
+// draw renders the current game state
 func (g *Game) draw() {
 	ClearScreen()
 	DrawGround()
@@ -65,6 +74,7 @@ func (g *Game) draw() {
 	termbox.Flush()
 }
 
+// Run starts the game loop
 func (g *Game) Run() {
 	for range g.ticker.C {
 		select {
@@ -79,6 +89,7 @@ func (g *Game) Run() {
 	}
 }
 
+// gameOver displays game over screen and waits for quit
 func (g *Game) gameOver() {
 	ClearScreen()
 	PrintCenter("GAME OVER (press q)")

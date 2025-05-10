@@ -2,7 +2,7 @@ package game
 
 import "github.com/nsf/termbox-go"
 
-// Dino represents the player
+// Dino represents the player character
 type Dino struct {
 	X, Y       int
 	jumping    bool
