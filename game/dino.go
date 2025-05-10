@@ -17,28 +17,9 @@ func NewDino() *Dino {
 
 // Update advances the dino's position with smooth jump and hang time
 func (d *Dino) Update() {
-	// Only update when in air or hangFrames > 0
-	if d.posY < float64(height-2) || d.velY != 0 || d.hangFrames > 0 {
-		// calculate next velocity
-		nextVel := d.velY + gravity
-		// detect apex crossing and start hang
-		if d.velY < 0 && nextVel >= 0 {
-			d.hangFrames = hangDuration
-			d.velY = 0
-		} else if d.hangFrames > 0 {
-			// hang time: stay at apex
-			d.hangFrames--
-		} else {
-			// normal physics update
-			d.posY += d.velY
-			d.velY = nextVel
-		}
-		// landing on ground
-		if d.posY >= float64(height-2) {
-			d.posY = float64(height - 2)
-			d.velY = 0
-			d.hangFrames = 0
-		}
+	if d.shouldUpdate() {
+		d.applyPhysics()
+		d.checkLanding()
 	}
 }
 
@@ -56,4 +37,47 @@ func (d *Dino) Draw() {
 	y := int(d.posY)
 	startY := y - (h - 1)
 	dinoSprite.Draw(d.X, startY, termbox.ColorGreen, termbox.ColorDefault)
+}
+
+// shouldUpdate returns true if the dino is airborne or hanging
+func (d *Dino) shouldUpdate() bool {
+	return d.posY < float64(height-2) || d.velY != 0 || d.hangFrames > 0
+}
+
+// applyPhysics updates velocity and position, handling apex hang
+func (d *Dino) applyPhysics() {
+	nextVel := d.velY + gravity
+	if d.isApex(nextVel) {
+		d.startHang()
+	} else if d.isHanging() {
+		d.hangFrames--
+	} else {
+		d.posY += d.velY
+		d.velY = nextVel
+	}
+}
+
+// isApex returns true when dino transitions from rising to falling
+func (d *Dino) isApex(nextVel float64) bool {
+	return d.velY < 0 && nextVel >= 0
+}
+
+// startHang sets up hang frames at apex
+func (d *Dino) startHang() {
+	d.hangFrames = hangDuration
+	d.velY = 0
+}
+
+// isHanging returns true if the dino is in hang time
+func (d *Dino) isHanging() bool {
+	return d.hangFrames > 0
+}
+
+// checkLanding resets the dino when landing on ground
+func (d *Dino) checkLanding() {
+	if d.posY >= float64(height-2) {
+		d.posY = float64(height - 2)
+		d.velY = 0
+		d.hangFrames = 0
+	}
 }
