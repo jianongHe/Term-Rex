@@ -127,6 +127,11 @@ func (g *Game) draw() {
 	PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
 	g.drawGround()
 	g.dino.Draw()
+	if !g.started {
+		PrintCenter("Press Space or Up Arrow to Start")
+		termbox.Flush()
+		return
+	}
 	// only draw obstacle if it is on extended ground
 	if g.obstacle.X >= g.groundStart && g.obstacle.X <= g.groundEnd {
 		g.obstacle.Draw()
