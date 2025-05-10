@@ -49,7 +49,7 @@ func (g *Game) applyStage() {
 	}
 }
 
-// checkCollision returns true if the dino and obstacle sprites overlap pixel-perfect (non-space chars).
+// checkCollision returns true if the dino and obstacle sprites overlap on non-space chars.
 func (g *Game) checkCollision() bool {
 	// Determine Dino sprite and bounds
 	var dSprite Sprite
@@ -65,8 +65,6 @@ func (g *Game) checkCollision() bool {
 	dH := len(dSprite)
 	dX0 := g.dino.X
 	dY0 := int(g.dino.posY) - (dH - 1)
-	dX1 := g.dino.X + dW - 1
-	dY1 := int(g.dino.posY)
 
 	// Determine Obstacle sprite and bounds
 	var oSprite Sprite
@@ -79,20 +77,14 @@ func (g *Game) checkCollision() bool {
 	oH := len(oSprite)
 	oX0 := int(math.Round(g.obstacle.posX))
 	oY0 := g.obstacle.Y - (oH - 1)
-	oX1 := oX0 + oW - 1
-	oY1 := g.obstacle.Y
 
-	// Quick reject bounding boxes
-	if dX1 < oX0 || oX1 < dX0 || dY1 < oY0 || oY1 < dY0 {
-		return false
-	}
-
-	// Pixel-perfect collision: check overlapping cells
+	// Compute overlap rectangle
 	xStart := max(dX0, oX0)
-	xEnd := min(dX1, oX1)
+	xEnd := min(dX0+dW-1, oX0+oW-1)
 	yStart := max(dY0, oY0)
-	yEnd := min(dY1, oY1)
+	yEnd := min(dY0+dH-1, oY0+oH-1)
 
+	// Check each overlapping cell: collision only if both chars are non-space
 	for y := yStart; y <= yEnd; y++ {
 		for x := xStart; x <= xEnd; x++ {
 			dx := x - dX0
