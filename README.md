@@ -1,6 +1,6 @@
 # Term-Rex: Command-Line Dino Runner
 
-A terminal-based dinosaur runner game inspired by the Chrome offline game, implemented in Python using the curses library.
+A terminal-based dinosaur runner game inspired by the Chrome offline game, implemented in Golang using the curses library.
 
 ## Game Features
 
@@ -9,6 +9,7 @@ A terminal-based dinosaur runner game inspired by the Chrome offline game, imple
 - Progressive difficulty that increases over time
 - Score tracking based on survival time
 - High score persistence between game sessions
+- Three types of obstacles: cacti, small birds, and big birds
 
 ## Controls
 
@@ -19,20 +20,18 @@ A terminal-based dinosaur runner game inspired by the Chrome offline game, imple
 
 ## Requirements
 
-- Python 3.x
-- curses library (built-in on most Unix systems, including macOS)
-- For Windows users: `windows-curses` package
+- Go
 
 ## How to Run
 
 ```bash
-python3 dino_runner.py
+go run main.go
 ```
 
 ## Game Rules
 
 - The dinosaur automatically runs forward
-- Obstacles (cacti) move from right to left
+- Obstacles (cacti, small birds, and big birds) move from right to left
 - Press space or up arrow to jump over obstacles
 - Jumping has a fixed height and duration (no double jumping)
 - Colliding with an obstacle ends the game

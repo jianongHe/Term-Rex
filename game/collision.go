@@ -21,11 +21,15 @@ func (g *Game) checkCollision() bool {
 
 	// Determine Obstacle sprite and bounds
 	var oSprite Sprite
-	if g.obstacle.isBird {
+	switch g.obstacle.obstacleType {
+	case Bird:
 		oSprite = birdFrames[g.obstacle.animFrame]
-	} else {
+	case BigBird:
+		oSprite = bigBirdFrames[g.obstacle.animFrame]
+	default: // Cactus
 		oSprite = obstacleFrames[g.obstacle.animFrame]
 	}
+
 	oW := len(oSprite[0])
 	oH := len(oSprite)
 	oX0 := int(math.Round(g.obstacle.posX))

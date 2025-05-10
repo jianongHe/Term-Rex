@@ -26,6 +26,7 @@ func (g *Game) applyStage() {
 			g.stageIndexActive = g.stageIndexTarget
 			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed
 			birdProbability = stageConfigs[g.stageIndexActive].BirdProb
+			bigBirdProbability = stageConfigs[g.stageIndexActive].BigBirdProb
 			g.stageTransitionStart = time.Time{}
 		} else {
 			// interpolate between active and target
@@ -34,11 +35,13 @@ func (g *Game) applyStage() {
 			speed := old.Speed + frac*(next.Speed-old.Speed)
 			obstacleSpeed = speed
 			birdProbability = old.BirdProb + frac*(next.BirdProb-old.BirdProb)
+			bigBirdProbability = old.BigBirdProb + frac*(next.BigBirdProb-old.BigBirdProb)
 		}
 	} else {
 		// no transition: keep active stage values
 		sc := stageConfigs[g.stageIndexActive]
 		obstacleSpeed = sc.Speed
 		birdProbability = sc.BirdProb
+		bigBirdProbability = sc.BigBirdProb
 	}
 }

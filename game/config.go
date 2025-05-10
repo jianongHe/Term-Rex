@@ -111,21 +111,44 @@ var birdFrames = []Sprite{
 	},
 }
 
+// Animation frames for big birds
+var bigBirdFrames = []Sprite{
+	{
+		"  /\\    ",
+		" /  \\   ",
+		"<ooo=-- ",
+		" \\__/   ",
+	},
+	{
+		"  /\\    ",
+		" /  \\   ",
+		"<OOO=-- ",
+		" \\__/   ",
+	},
+}
+
 // bird appearance probability
 var birdProbability = 0.3
+
+// big bird appearance probability
+var bigBirdProbability = 0.15
+
+// big bird flight height (row index) above bottom of screen
+const bigBirdFlightRow = 7
 
 // StageConfig defines dynamic game parameters per stage based on score.
 type StageConfig struct {
 	ScoreThreshold int     // minimum score to enter this stage
 	Speed          float64 // obstacleSpeed for this stage
 	BirdProb       float64 // birdProbability for this stage
+	BigBirdProb    float64 // bigBirdProbability for this stage
 }
 
 // stageConfigs lists the stages in ascending order of score threshold.
 var stageConfigs = []StageConfig{
-	{ScoreThreshold: 0, Speed: 1.4, BirdProb: 0.1},
-	{ScoreThreshold: 300, Speed: 2.0, BirdProb: 0.3},
-	{ScoreThreshold: 1000, Speed: 3.0, BirdProb: 0.5},
+	{ScoreThreshold: 0, Speed: 1.4, BirdProb: 0.1, BigBirdProb: 0.05},
+	{ScoreThreshold: 300, Speed: 2.0, BirdProb: 0.3, BigBirdProb: 0.1},
+	{ScoreThreshold: 1000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2},
 }
 
 // duration of smooth transition between stages

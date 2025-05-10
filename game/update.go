@@ -48,6 +48,7 @@ func (g *Game) gameOver() {
 				g.stageTransitionStart = time.Time{}
 				obstacleSpeed = stageConfigs[0].Speed
 				birdProbability = stageConfigs[0].BirdProb
+				bigBirdProbability = stageConfigs[0].BigBirdProb
 				return
 			}
 			if ev.Key == KeyQuit || ev.Ch == KeyQuitRune {
