@@ -13,8 +13,8 @@ func main() {
 	defer termbox.Close()
 
 	// dynamic width based on terminal size
-	w, _ := termbox.Size()
-	game.SetWidth(w)
+	//w, _ := termbox.Size()
+	//game.SetWidth(w)
 
 	// start game
 	g := game.NewGame()

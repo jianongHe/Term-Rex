@@ -18,6 +18,14 @@ func (o *Obstacle) Update() {
 	}
 }
 
+var obstacleSprite = Sprite{
+	" | ",
+	"/|\\",
+	" | ",
+}
+
 func (o *Obstacle) Draw() {
-	termbox.SetCell(o.X, o.Y, '|', termbox.ColorRed, termbox.ColorDefault)
+	h := len(obstacleSprite)
+	startY := o.Y - (h - 1)
+	obstacleSprite.Draw(o.X, startY, termbox.ColorRed, termbox.ColorDefault)
 }

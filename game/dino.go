@@ -31,6 +31,14 @@ func (d *Dino) Jump() {
 	}
 }
 
+var dinoSprite = Sprite{
+	"  _  ",
+	" /_\\ ",
+	"/___\\",
+}
+
 func (d *Dino) Draw() {
-	termbox.SetCell(d.X, d.Y, '@', termbox.ColorGreen, termbox.ColorDefault)
+	h := len(dinoSprite)
+	startY := d.Y - (h - 1)
+	dinoSprite.Draw(d.X, startY, termbox.ColorGreen, termbox.ColorDefault)
 }

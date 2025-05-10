@@ -5,8 +5,30 @@ import (
 	"time"
 )
 
+// checkCollision returns true if the dino and obstacle sprites overlap.
+func (g *Game) checkCollision() bool {
+	// Dino bounds
+	dW := len(dinoSprite[0])
+	dH := len(dinoSprite)
+	dX0 := g.dino.X
+	dY0 := g.dino.Y - (dH - 1)
+	dX1 := g.dino.X + dW - 1
+	dY1 := g.dino.Y
+
+	// Obstacle bounds
+	oW := len(obstacleSprite[0])
+	oH := len(obstacleSprite)
+	oX0 := g.obstacle.X
+	oY0 := g.obstacle.Y - (oH - 1)
+	oX1 := g.obstacle.X + oW - 1
+	oY1 := g.obstacle.Y
+
+	// Check for intersection
+	return !(dX1 < oX0 || oX1 < dX0 || dY1 < oY0 || oY1 < dY0)
+}
+
 var (
-	width  int
+	width  = 50
 	height = 10
 	fps    = 24
 )
@@ -60,7 +82,7 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 func (g *Game) update() {
 	g.dino.Update()
 	g.obstacle.Update()
-	if g.obstacle.X == g.dino.X && g.obstacle.Y == g.dino.Y {
+	if g.checkCollision() {
 		g.gameOver()
 	}
 }
