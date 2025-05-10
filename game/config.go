@@ -38,7 +38,7 @@ var obstacleSpeed float64 = 1.0
 const groundExtendSpeed = 3
 
 // initial ground length in cells (total width)
-const initialGroundLength = 6
+const initialGroundLength = 24
 
 // duck hold duration in frames
 const duckHoldDuration = fps - 11
@@ -60,21 +60,23 @@ var dinoStandFrames = []Sprite{
 		" +    ++@++ ",
 		" + +++++  + ",
 		"  ++++++    ",
-		"   |   |    ",
+		"   /   /    ",
 	},
 }
 
 // Animation frames for ducking Dino
 var dinoDuckFrames = []Sprite{
 	{
-		"  _  ",
-		" /_\\ ",
-		"/___\\",
+		"       ++++ ",
+		" -    ++@++ ",
+		"  ++++++    ",
+		"   :   :    ",
 	},
 	{
-		"  +  ",
-		" /_\\ ",
-		"/___\\",
+		"       ++++ ",
+		" +    ++@++ ",
+		"  ++++++    ",
+		"   ;   ;    ",
 	},
 }
 
@@ -98,12 +100,14 @@ var obstacleFrames = []Sprite{
 // Animation frames for flying birds
 var birdFrames = []Sprite{
 	{
-		" <o> ",
-		" <o> ",
+		" |   ",
+		"<o=- ",
+		" |   ",
 	},
 	{
-		" <O> ",
-		" <O> ",
+		" /   ",
+		"<O=- ",
+		" \\   ",
 	},
 }
 
@@ -128,7 +132,7 @@ var stageConfigs = []StageConfig{
 var stageTransitionDuration = 3000 * time.Millisecond
 
 // bird flight height (row index) above bottom of screen
-const birdFlightRow = 10
+const birdFlightRow = 9
 
 // Key bindings
 const (
