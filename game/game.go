@@ -24,6 +24,7 @@ type Game struct {
 	groundEnd            int
 	started              bool
 	groundExtending      bool
+	collided             bool // indicates collision occurred
 	stageIndexActive     int
 	stageIndexTarget     int
 	stageTransitionStart time.Time
@@ -121,6 +122,13 @@ func (g *Game) Run() {
 		default:
 		}
 		g.update()
+		if g.collided {
+			g.draw()
+			g.gameOver()
+			// clear collision flag and restart loop
+			g.collided = false
+			continue
+		}
 		if g.started {
 			g.score++
 		}

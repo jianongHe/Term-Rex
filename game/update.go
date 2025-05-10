@@ -14,7 +14,7 @@ func (g *Game) update() {
 		g.applyStage()
 		g.obstacle.Update()
 		if g.checkCollision() {
-			g.gameOver()
+			g.collided = true
 		}
 		if g.groundExtending {
 			g.updateGround()
