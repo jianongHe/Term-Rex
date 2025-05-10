@@ -100,12 +100,12 @@ var obstacleFrames = []Sprite{
 // Animation frames for group cactus obstacles
 var groupCactusFrames = []Sprite{
 	{
-		" |    ",
+		"    |  ",
 		"/|\\/|\\",
 		" |  |",
 	},
 	{
-		" |    ",
+		"    |  ",
 		"\\|//|\\",
 		" |  |",
 	},
