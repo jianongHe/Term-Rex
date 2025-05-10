@@ -17,7 +17,7 @@ const height = 15
 const fps = 24
 
 // 跳跃高度（行数）
-const jumpHeight = 4
+const jumpHeight = 5
 
 // 跳跃持续帧数
 const jumpDuration = fps / 4
@@ -32,7 +32,7 @@ var gravity = -jumpVelocity / float64(jumpDuration)
 const hangDuration = 2
 
 // 障碍物每帧移动的格数
-const obstacleSpeed = 1
+var obstacleSpeed float64 = 1.0
 
 // ground extension speed in cells per frame
 const groundExtendSpeed = 3
@@ -49,18 +49,18 @@ var tickDuration = time.Second / time.Duration(fps)
 // Animation frames for standing Dino
 var dinoStandFrames = []Sprite{
 	{
-		"  __   ",
-		" /oo\\  ",
-		"/|  |\\ ",
-		"  ||   ",
-		" /  \\  ",
+		"       ++++ ",
+		"++    ++@++ ",
+		" + +++++  + ",
+		"  ++++++    ",
+		"   |   |    ",
 	},
 	{
-		"  __   ",
-		" /oo\\  ",
-		"/|  |\\ ",
-		"  ||   ",
-		" \\  /  ",
+		"       ++++ ",
+		" +    ++@++ ",
+		" + +++++  + ",
+		"  ++++++    ",
+		"   |   |    ",
 	},
 }
 
@@ -99,14 +99,33 @@ var obstacleFrames = []Sprite{
 var birdFrames = []Sprite{
 	{
 		" <o> ",
+		" <o> ",
 	},
 	{
+		" <O> ",
 		" <O> ",
 	},
 }
 
 // bird appearance probability
-const birdProbability = 0.3
+var birdProbability = 0.3
+
+// StageConfig defines dynamic game parameters per stage based on score.
+type StageConfig struct {
+	ScoreThreshold int     // minimum score to enter this stage
+	Speed          float64 // obstacleSpeed for this stage
+	BirdProb       float64 // birdProbability for this stage
+}
+
+// stageConfigs lists the stages in ascending order of score threshold.
+var stageConfigs = []StageConfig{
+	{ScoreThreshold: 0, Speed: 1.4, BirdProb: 0.1},
+	{ScoreThreshold: 300, Speed: 2.0, BirdProb: 0.3},
+	{ScoreThreshold: 1000, Speed: 3.0, BirdProb: 0.5},
+}
+
+// duration of smooth transition between stages
+var stageTransitionDuration = 3000 * time.Millisecond
 
 // bird flight height (row index) above bottom of screen
 const birdFlightRow = 10

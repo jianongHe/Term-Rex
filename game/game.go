@@ -3,17 +3,58 @@ package game
 import (
 	"fmt"
 	"github.com/nsf/termbox-go"
+	"math"
 	"os"
 	"time"
 )
 
-// checkCollision returns true if the dino and obstacle sprites overlap.
+// applyStage smoothly transitions parameters based on score threshold crossings.
+func (g *Game) applyStage() {
+	// determine target stage for current score
+	target := 0
+	for i := len(stageConfigs) - 1; i >= 0; i-- {
+		if g.score >= stageConfigs[i].ScoreThreshold {
+			target = i
+			break
+		}
+	}
+	// on first crossing, start transition
+	if target != g.stageIndexTarget {
+		g.stageIndexTarget = target
+		g.stageTransitionStart = time.Now()
+	}
+	// if currently transitioning between two stages
+	if g.stageIndexActive != g.stageIndexTarget {
+		elapsed := time.Since(g.stageTransitionStart)
+		frac := float64(elapsed) / float64(stageTransitionDuration)
+		if frac >= 1 {
+			// finish transition
+			g.stageIndexActive = g.stageIndexTarget
+			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed
+			birdProbability = stageConfigs[g.stageIndexActive].BirdProb
+			g.stageTransitionStart = time.Time{}
+		} else {
+			// interpolate between active and target
+			old := stageConfigs[g.stageIndexActive]
+			next := stageConfigs[g.stageIndexTarget]
+			speed := old.Speed + frac*(next.Speed-old.Speed)
+			obstacleSpeed = speed
+			birdProbability = old.BirdProb + frac*(next.BirdProb-old.BirdProb)
+		}
+	} else {
+		// no transition: keep active stage values
+		sc := stageConfigs[g.stageIndexActive]
+		obstacleSpeed = sc.Speed
+		birdProbability = sc.BirdProb
+	}
+}
+
+// checkCollision returns true if the dino and obstacle sprites overlap pixel-perfect (non-space chars).
 func (g *Game) checkCollision() bool {
-	// Dino bounds based on current animation frame
+	// Determine Dino sprite and bounds
 	var dSprite Sprite
 	onGround := int(g.dino.posY) == height-2
 	if !onGround {
-		// airborne: use first standing frame
 		dSprite = dinoStandFrames[0]
 	} else if g.dino.duckFrames > 0 {
 		dSprite = dinoDuckFrames[g.dino.animFrame]
@@ -23,12 +64,11 @@ func (g *Game) checkCollision() bool {
 	dW := len(dSprite[0])
 	dH := len(dSprite)
 	dX0 := g.dino.X
-	y := int(g.dino.posY)
-	dY0 := y - (dH - 1)
+	dY0 := int(g.dino.posY) - (dH - 1)
 	dX1 := g.dino.X + dW - 1
-	dY1 := y
+	dY1 := int(g.dino.posY)
 
-	// Obstacle bounds based on sprite
+	// Determine Obstacle sprite and bounds
 	var oSprite Sprite
 	if g.obstacle.isBird {
 		oSprite = birdFrames[g.obstacle.animFrame]
@@ -37,13 +77,48 @@ func (g *Game) checkCollision() bool {
 	}
 	oW := len(oSprite[0])
 	oH := len(oSprite)
-	oX0 := g.obstacle.X
+	oX0 := int(math.Round(g.obstacle.posX))
 	oY0 := g.obstacle.Y - (oH - 1)
-	oX1 := g.obstacle.X + oW - 1
+	oX1 := oX0 + oW - 1
 	oY1 := g.obstacle.Y
 
-	// Check for intersection
-	return !(dX1 < oX0 || oX1 < dX0 || dY1 < oY0 || oY1 < dY0)
+	// Quick reject bounding boxes
+	if dX1 < oX0 || oX1 < dX0 || dY1 < oY0 || oY1 < dY0 {
+		return false
+	}
+
+	// Pixel-perfect collision: check overlapping cells
+	xStart := max(dX0, oX0)
+	xEnd := min(dX1, oX1)
+	yStart := max(dY0, oY0)
+	yEnd := min(dY1, oY1)
+
+	for y := yStart; y <= yEnd; y++ {
+		for x := xStart; x <= xEnd; x++ {
+			dx := x - dX0
+			dy := y - dY0
+			ox := x - oX0
+			oy := y - oY0
+			if dSprite[dy][dx] != ' ' && oSprite[oy][ox] != ' ' {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// helper min and max
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 // SetWidth updates game width based on terminal size
@@ -53,15 +128,18 @@ func SetWidth(w int) {
 
 // Game holds all state
 type Game struct {
-	dino            *Dino
-	obstacle        *Obstacle
-	ticker          *time.Ticker
-	events          chan termbox.Event
-	score           int
-	groundStart     int
-	groundEnd       int
-	started         bool
-	groundExtending bool
+	dino                 *Dino
+	obstacle             *Obstacle
+	ticker               *time.Ticker
+	events               chan termbox.Event
+	score                int
+	groundStart          int
+	groundEnd            int
+	started              bool
+	groundExtending      bool
+	stageIndexActive     int
+	stageIndexTarget     int
+	stageTransitionStart time.Time
 }
 
 // NewGame initializes and returns a new Game
@@ -85,15 +163,18 @@ func NewGame() *Game {
 		ge = width - 1
 	}
 	return &Game{
-		dino:            d,
-		obstacle:        NewObstacle(),
-		ticker:          time.NewTicker(tickDuration),
-		events:          events,
-		score:           0,
-		groundStart:     gs,
-		groundEnd:       ge,
-		started:         false,
-		groundExtending: false,
+		dino:                 d,
+		obstacle:             NewObstacle(),
+		ticker:               time.NewTicker(tickDuration),
+		events:               events,
+		score:                0,
+		groundStart:          gs,
+		groundEnd:            ge,
+		started:              false,
+		groundExtending:      false,
+		stageIndexActive:     0,
+		stageIndexTarget:     0,
+		stageTransitionStart: time.Time{},
 	}
 }
 
@@ -128,6 +209,7 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 func (g *Game) update() {
 	g.dino.Update()
 	if g.started {
+		g.applyStage()
 		g.obstacle.Update()
 		if g.checkCollision() {
 			g.gameOver()
@@ -155,7 +237,8 @@ func (g *Game) draw() {
 		return
 	}
 	// only draw obstacle if it is on extended ground
-	if g.obstacle.X >= g.groundStart && g.obstacle.X <= g.groundEnd {
+	xPos := int(math.Round(g.obstacle.posX))
+	if xPos >= g.groundStart && xPos <= g.groundEnd {
 		g.obstacle.Draw()
 	}
 	termbox.Flush()

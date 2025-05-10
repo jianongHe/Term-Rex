@@ -2,12 +2,14 @@ package game
 
 import (
 	"github.com/nsf/termbox-go"
+	"math"
 	"math/rand"
 )
 
 // Obstacle moves across the screen
 type Obstacle struct {
-	X, Y        int
+	posX        float64
+	Y           int
 	isBird      bool
 	animFrame   int
 	animCounter int
@@ -22,7 +24,7 @@ func NewObstacle() *Obstacle {
 }
 
 func (o *Obstacle) reset() {
-	o.X = width - 1
+	o.posX = float64(width - 1)
 	if rand.Float64() < birdProbability {
 		o.isBird = true
 		// place bird at configurable flight height
@@ -36,8 +38,8 @@ func (o *Obstacle) reset() {
 }
 
 func (o *Obstacle) Update() {
-	o.X -= obstacleSpeed
-	if o.X < 0 {
+	o.posX -= obstacleSpeed
+	if o.posX < 0 {
 		o.reset()
 	}
 	o.updateAnimation()
@@ -55,7 +57,8 @@ func (o *Obstacle) Draw() {
 	}
 	h := len(sprite)
 	startY := o.Y - (h - 1)
-	sprite.Draw(o.X, startY, fg, termbox.ColorDefault)
+	x := int(math.Round(o.posX))
+	sprite.Draw(x, startY, fg, termbox.ColorDefault)
 }
 
 // updateAnimation advances obstacle animation frames
