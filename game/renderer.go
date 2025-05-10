@@ -22,3 +22,10 @@ func PrintCenter(msg string) {
 		termbox.SetCell(x+i, y, c, termbox.ColorWhite, termbox.ColorDefault)
 	}
 }
+
+// PrintAt prints a message at the specified coordinates.
+func PrintAt(x, y int, msg string) {
+	for i, ch := range msg {
+		termbox.SetCell(x+i, y, ch, termbox.ColorWhite, termbox.ColorDefault)
+	}
+}

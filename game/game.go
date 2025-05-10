@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"github.com/nsf/termbox-go"
 	"time"
 )
@@ -40,6 +41,7 @@ type Game struct {
 	obstacle *Obstacle
 	ticker   *time.Ticker
 	events   chan termbox.Event
+	score    int
 }
 
 // NewGame initializes and returns a new Game
@@ -55,6 +57,7 @@ func NewGame() *Game {
 		obstacle: NewObstacle(),
 		ticker:   time.NewTicker(tickDuration),
 		events:   events,
+		score:    0,
 	}
 }
 
@@ -86,6 +89,8 @@ func (g *Game) update() {
 // draw renders the current game state
 func (g *Game) draw() {
 	ClearScreen()
+	// display score and quit hint
+	PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
 	DrawGround()
 	g.dino.Draw()
 	g.obstacle.Draw()
@@ -103,6 +108,7 @@ func (g *Game) Run() {
 		default:
 		}
 		g.update()
+		g.score++
 		g.draw()
 	}
 }
