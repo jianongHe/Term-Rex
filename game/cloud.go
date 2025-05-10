@@ -112,7 +112,7 @@ func (cm *CloudManager) createNewCloud() *Cloud {
 		x:         newX, // Explicitly set x to match posX initially
 		y:         cloudMinHeight + rand.Intn(cloudMaxHeight-cloudMinHeight+1),
 		width:     cloudWidth,
-		speed:     cloudMinSpeed + rand.Float64()*(cloudMaxSpeed-cloudMinSpeed),
+		speed:     (cloudMinSpeed + rand.Float64()*(cloudMaxSpeed-cloudMinSpeed)),
 		cloudType: cloudType,
 		color:     cm.colors[rand.Intn(len(cm.colors))],
 	}
@@ -121,7 +121,8 @@ func (cm *CloudManager) createNewCloud() *Cloud {
 // Update moves all clouds and cycles them when they move off-screen
 func (cm *CloudManager) Update() {
 	for i, cloud := range cm.clouds {
-		cloud.posX -= cloud.speed
+		// 使用速度因子调整云朵移动速度，保持与原始帧率下相同的视觉速度
+		cloud.posX -= cloud.speed * speedFactor
 		cloud.x = int(cloud.posX)
 
 		// If cloud has moved completely off-screen to the left

@@ -83,6 +83,7 @@ func (d *Dino) applyPhysics() {
 	} else if d.isHanging() {
 		d.hangFrames--
 	} else {
+		// 使用更小的增量来实现更平滑的移动
 		d.posY += d.velY
 		d.velY = nextVel
 	}

@@ -68,7 +68,7 @@ func (g *Game) gameOver() {
 				g.stageIndexActive = 0
 				g.stageIndexTarget = 0
 				g.stageTransitionStart = time.Time{}
-				obstacleSpeed = stageConfigs[0].Speed
+				obstacleSpeed = stageConfigs[0].Speed * speedFactor
 				birdProbability = stageConfigs[0].BirdProb
 				bigBirdProbability = stageConfigs[0].BigBirdProb
 				return
@@ -84,13 +84,23 @@ func (g *Game) gameOver() {
 // updateGround expands the ground boundaries until filling the screen.
 func (g *Game) updateGround() {
 	if g.groundStart > 0 {
-		g.groundStart -= groundExtendSpeed
+		// 使用向下取整的方式将浮点数转换为整数
+		moveAmount := int(groundExtendSpeed)
+		if moveAmount < 1 {
+			moveAmount = 1 // 确保至少移动1个单位
+		}
+		g.groundStart -= moveAmount
 		if g.groundStart < 0 {
 			g.groundStart = 0
 		}
 	}
 	if g.groundEnd < width-1 {
-		g.groundEnd += groundExtendSpeed
+		// 使用向下取整的方式将浮点数转换为整数
+		moveAmount := int(groundExtendSpeed)
+		if moveAmount < 1 {
+			moveAmount = 1 // 确保至少移动1个单位
+		}
+		g.groundEnd += moveAmount
 		if g.groundEnd > width-1 {
 			g.groundEnd = width - 1
 		}

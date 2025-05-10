@@ -35,7 +35,7 @@ func (g *Game) applyStage() {
 		if frac >= 1 {
 			// finish transition
 			g.stageIndexActive = g.stageIndexTarget
-			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed
+			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed * speedFactor
 			birdProbability = stageConfigs[g.stageIndexActive].BirdProb
 			bigBirdProbability = stageConfigs[g.stageIndexActive].BigBirdProb
 			groupCactusProbability = stageConfigs[g.stageIndexActive].GroupCactusProb
@@ -45,7 +45,7 @@ func (g *Game) applyStage() {
 			old := stageConfigs[g.stageIndexActive]
 			next := stageConfigs[g.stageIndexTarget]
 			speed := old.Speed + frac*(next.Speed-old.Speed)
-			obstacleSpeed = speed
+			obstacleSpeed = speed * speedFactor
 			birdProbability = old.BirdProb + frac*(next.BirdProb-old.BirdProb)
 			bigBirdProbability = old.BigBirdProb + frac*(next.BigBirdProb-old.BigBirdProb)
 			groupCactusProbability = old.GroupCactusProb + frac*(next.GroupCactusProb-old.GroupCactusProb)
@@ -53,7 +53,7 @@ func (g *Game) applyStage() {
 	} else {
 		// no transition: keep active stage values
 		sc := stageConfigs[g.stageIndexActive]
-		obstacleSpeed = sc.Speed
+		obstacleSpeed = sc.Speed * speedFactor
 		birdProbability = sc.BirdProb
 		bigBirdProbability = sc.BigBirdProb
 		groupCactusProbability = sc.GroupCactusProb

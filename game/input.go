@@ -32,6 +32,10 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 		case 'm': // 音效开关
 			am := GetAudioManager()
 			am.SetEnabled(!am.IsEnabled())
+			// 保持蹲下状态，如果当前正在蹲下
+			if g.started && int(g.dino.posY) == height-2 && g.dino.duckFrames > 0 {
+				g.dino.duckFrames = duckHoldDuration
+			}
 		}
 	}
 	return true

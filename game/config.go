@@ -14,12 +14,18 @@ var width = 80
 const height = 15
 
 // 帧率（FPS）
-const fps = 24
+const fps = 60 // 从24提高到60，使游戏更流畅
+
+// 原始帧率（用于计算速度调整因子）
+const originalFps = 24
+
+// 速度调整因子（保持与原始24FPS相同的游戏速度）
+const speedFactor = float64(originalFps) / float64(fps)
 
 // 跳跃高度（行数）
 const jumpHeight = 5
 
-// 跳跃持续帧数
+// 跳跃持续帧数（根据新帧率调整）
 const jumpDuration = fps / 4
 
 // initial jump velocity (calculated to reach jumpHeight in jumpDuration frames)
@@ -31,17 +37,17 @@ var gravity = -jumpVelocity / float64(jumpDuration)
 // hang time at apex in frames
 const hangDuration = 2
 
-// 障碍物每帧移动的格数
-var obstacleSpeed float64 = 1.0
+// 障碍物每帧移动的格数（根据速度因子调整）
+var obstacleSpeed float64 = 1.0 * speedFactor
 
-// ground extension speed in cells per frame
-const groundExtendSpeed = 3
+// ground extension speed in cells per frame（根据速度因子调整）
+var groundExtendSpeed float64 = 3 * speedFactor
 
 // initial ground length in cells (total width)
 const initialGroundLength = 24
 
 // duck hold duration in frames
-const duckHoldDuration = fps - 11
+var duckHoldDuration = fps/2 + 1
 
 // 每帧间隔
 var tickDuration = time.Second / time.Duration(fps)
@@ -92,8 +98,8 @@ var dinoDuckFrames = []Sprite{
 	},
 }
 
-// frames between animation switches
-const animPeriod = fps / 6
+// frames between animation switches (adjusted for new FPS)
+const animPeriod = fps / 12
 
 // Animation frames for single cactus obstacles
 var obstacleFrames = []Sprite{
