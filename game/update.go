@@ -31,6 +31,14 @@ func (g *Game) update() {
 // gameOver displays game over screen and waits for restart or quit
 func (g *Game) gameOver() {
 	PrintCenter("GAME OVER (r to retry, q to quit)")
+
+	// 显示音效控制提示
+	soundMsg := "Press 'm' to toggle sound"
+	if !GetAudioManager().IsEnabled() {
+		soundMsg = "Sound OFF - Press 'm' to enable"
+	}
+	PrintCenterAt(soundMsg, height/2+2)
+
 	termbox.Flush()
 	for {
 		ev := <-g.events

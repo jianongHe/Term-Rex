@@ -22,8 +22,14 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 		case KeyQuit:
 			return false
 		}
-		if ev.Ch == KeyQuitRune {
+
+		// 处理字符键
+		switch ev.Ch {
+		case KeyQuitRune:
 			return false
+		case 'm': // 音效开关
+			am := GetAudioManager()
+			am.SetEnabled(!am.IsEnabled())
 		}
 	}
 	return true

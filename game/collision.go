@@ -43,6 +43,8 @@ func (g *Game) checkCollision() bool {
 			ox := x - oX0
 			oy := y - oY0
 			if dSprite[dy][dx] != ' ' && oSprite[oy][ox] != ' ' {
+				// 播放碰撞音效
+				GetAudioManager().PlaySound(SoundCollision)
 				return true
 			}
 		}

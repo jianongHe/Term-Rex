@@ -86,6 +86,13 @@ func (g *Game) drawStartScreen() {
 	g.dino.Draw()
 
 	PrintCenter("Press Space or Up Arrow to Start")
+
+	// 显示音效控制提示
+	soundMsg := "Press 'm' to toggle sound"
+	if !GetAudioManager().IsEnabled() {
+		soundMsg = "Sound OFF - Press 'm' to enable"
+	}
+	PrintCenterAt(soundMsg, height/2+2)
 }
 
 // drawGameScene renders the full game scene after start
@@ -117,11 +124,18 @@ func (g *Game) draw() {
 	ClearScreen()
 	// score and quit hint
 	PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
-	if g.highestScore > 0 {
-		hsText := fmt.Sprintf("High: %d", g.highestScore)
-		x := width - len(hsText)
-		PrintAt(x, 0, hsText)
+
+	// 显示音效状态
+	soundStatus := "Sound: ON (m)"
+	if !GetAudioManager().IsEnabled() {
+		soundStatus = "Sound: OFF (m)"
 	}
+	PrintAt(width/2-len(soundStatus)/2, 0, soundStatus)
+
+	// 始终显示最高分，即使是0
+	hsText := fmt.Sprintf("High: %d", g.highestScore)
+	x := width - len(hsText)
+	PrintAt(x, 0, hsText)
 	if !g.started {
 		g.drawStartScreen()
 		termbox.Flush()
@@ -134,6 +148,11 @@ func (g *Game) draw() {
 
 // Run starts the game loop
 func (g *Game) Run() {
+	// 初始化音频系统
+	GetAudioManager()
+
+	lastScoreMilestone := 0
+
 	for range g.ticker.C {
 		select {
 		case ev := <-g.events:
@@ -152,6 +171,12 @@ func (g *Game) Run() {
 		}
 		if g.started {
 			g.score++
+
+			// 每得到100分播放一次得分音效
+			if g.score/ScoreMilestone > lastScoreMilestone {
+				lastScoreMilestone = g.score / ScoreMilestone
+				GetAudioManager().PlaySound(SoundScore)
+			}
 		}
 		g.draw()
 	}

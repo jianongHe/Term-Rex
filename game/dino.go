@@ -37,6 +37,9 @@ func (d *Dino) Jump() {
 	if d.posY == float64(height-2) {
 		d.velY = jumpVelocity
 		d.hangFrames = 0
+
+		// 播放跳跃音效
+		GetAudioManager().PlaySound(SoundJump)
 	}
 }
 

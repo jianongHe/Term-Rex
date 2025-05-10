@@ -46,6 +46,12 @@ const duckHoldDuration = fps - 11
 // 每帧间隔
 var tickDuration = time.Second / time.Duration(fps)
 
+// 音效相关配置
+const (
+	AudioEnabled   = true // 默认启用音效
+	ScoreMilestone = 100  // 每得到100分播放一次得分音效
+)
+
 // Animation frames for standing Dino
 var dinoStandFrames = []Sprite{
 	{

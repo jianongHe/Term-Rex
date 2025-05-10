@@ -86,6 +86,14 @@ func PrintCenter(msg string) {
 	}
 }
 
+// PrintCenterAt prints a message centered horizontally at the specified row
+func PrintCenterAt(msg string, row int) {
+	x := (width - len(msg)) / 2
+	for i, c := range msg {
+		termbox.SetCell(x+i, row, c, termbox.ColorWhite, termbox.ColorDefault)
+	}
+}
+
 // PrintAt prints a message at the specified coordinates.
 func PrintAt(x, y int, msg string) {
 	for i, ch := range msg {

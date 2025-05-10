@@ -10,6 +10,7 @@ A terminal-based dinosaur runner game inspired by the Chrome offline game, imple
 - Score tracking based on survival time
 - High score persistence between game sessions
 - Three types of obstacles: cacti, small birds, and big birds
+- Sound effects for jumping, collision, and scoring
 
 ## Controls
 
@@ -17,6 +18,7 @@ A terminal-based dinosaur runner game inspired by the Chrome offline game, imple
 - **p**: Pause/Unpause the game
 - **q**: Quit the game
 - **r**: Restart after game over
+- **m**: Toggle sound effects on/off
 
 ## Requirements
 
@@ -45,6 +47,7 @@ The game is built using object-oriented design with the following main component
 - `Game`: Main game controller that manages the game loop and state
 - `Player`: Represents the dinosaur character with jumping mechanics
 - `Obstacle`: Represents obstacles that the player must avoid
+- `AudioManager`: Manages sound effects for game events
 
 ## Implementation Details
 
@@ -52,3 +55,4 @@ The game is built using object-oriented design with the following main component
 - Non-blocking input handling
 - Terminal display is properly restored after exit
 - High score tracking between sessions
+- Sound effects using the beep library
