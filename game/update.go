@@ -71,6 +71,7 @@ func (g *Game) gameOver() {
 				obstacleSpeed = stageConfigs[0].Speed * speedFactor
 				birdProbability = stageConfigs[0].BirdProb
 				bigBirdProbability = stageConfigs[0].BigBirdProb
+				groupCactusProbability = stageConfigs[0].GroupCactusProb
 				return
 			}
 			if ev.Key == KeyQuit || ev.Ch == KeyQuitRune {

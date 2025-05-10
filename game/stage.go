@@ -39,6 +39,14 @@ func (g *Game) applyStage() {
 			birdProbability = stageConfigs[g.stageIndexActive].BirdProb
 			bigBirdProbability = stageConfigs[g.stageIndexActive].BigBirdProb
 			groupCactusProbability = stageConfigs[g.stageIndexActive].GroupCactusProb
+
+			// 更新障碍物间距
+			g.obstacleManager.UpdateStageGaps(
+				stageConfigs[g.stageIndexActive].MinGap,
+				stageConfigs[g.stageIndexActive].MaxGap,
+				g.stageIndexActive,
+			)
+
 			g.stageTransitionStart = time.Time{}
 		} else {
 			// interpolate between active and target
@@ -49,6 +57,12 @@ func (g *Game) applyStage() {
 			birdProbability = old.BirdProb + frac*(next.BirdProb-old.BirdProb)
 			bigBirdProbability = old.BigBirdProb + frac*(next.BigBirdProb-old.BigBirdProb)
 			groupCactusProbability = old.GroupCactusProb + frac*(next.GroupCactusProb-old.GroupCactusProb)
+
+			// 平滑过渡障碍物间距
+			minGap := int(float64(old.MinGap) + frac*float64(next.MinGap-old.MinGap))
+			maxGap := int(float64(old.MaxGap) + frac*float64(next.MaxGap-old.MaxGap))
+			stageIndex := g.stageIndexActive // 在过渡期间使用当前活动阶段
+			g.obstacleManager.UpdateStageGaps(minGap, maxGap, stageIndex)
 		}
 	} else {
 		// no transition: keep active stage values
@@ -57,5 +71,8 @@ func (g *Game) applyStage() {
 		birdProbability = sc.BirdProb
 		bigBirdProbability = sc.BigBirdProb
 		groupCactusProbability = sc.GroupCactusProb
+
+		// 确保障碍物间距与当前阶段一致
+		g.obstacleManager.UpdateStageGaps(sc.MinGap, sc.MaxGap, g.stageIndexActive)
 	}
 }

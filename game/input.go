@@ -17,7 +17,7 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 		case KeyDuck:
 			// only allow ducking when on ground
 			if g.started && int(g.dino.posY) == height-2 {
-				g.dino.duckFrames = duckHoldDuration
+				g.dino.Duck()
 			}
 		case KeyQuit:
 			return false
@@ -33,8 +33,8 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 			am := GetAudioManager()
 			am.SetEnabled(!am.IsEnabled())
 			// 保持蹲下状态，如果当前正在蹲下
-			if g.started && int(g.dino.posY) == height-2 && g.dino.duckFrames > 0 {
-				g.dino.duckFrames = duckHoldDuration
+			if g.started && int(g.dino.posY) == height-2 && g.dino.IsDucking() {
+				g.dino.Duck()
 			}
 		}
 	}

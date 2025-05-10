@@ -113,3 +113,18 @@ func (d *Dino) checkLanding() {
 		d.hangFrames = 0
 	}
 }
+
+// Duck initiates ducking state for the specified duration
+func (d *Dino) Duck() {
+	d.duckFrames = duckHoldDuration
+}
+
+// IsDucking returns true if the dino is currently in ducking state
+func (d *Dino) IsDucking() bool {
+	return d.duckFrames > 0
+}
+
+// GetY returns the current Y position of the dino
+func (d *Dino) GetY() int {
+	return int(d.posY)
+}

@@ -3,7 +3,6 @@ package game
 import (
 	"fmt"
 	"github.com/nsf/termbox-go"
-	"math"
 	"strings"
 	"time"
 )
@@ -129,12 +128,7 @@ func (g *Game) drawGameScene() {
 	g.dino.Draw()
 
 	// obstacle
-	obstacle := g.obstacleManager.GetCurrentObstacle()
-	x, _ := obstacle.GetPosition()
-	xPos := int(math.Round(x))
-	if xPos >= g.groundStart && xPos <= g.groundEnd {
-		g.obstacleManager.Draw()
-	}
+	g.obstacleManager.Draw()
 }
 
 // draw renders the current game state

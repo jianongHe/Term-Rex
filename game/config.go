@@ -229,19 +229,21 @@ type StageConfig struct {
 	BirdProb        float64 // birdProbability for this stage
 	BigBirdProb     float64 // bigBirdProbability for this stage
 	GroupCactusProb float64 // groupCactusProbability for this stage
+	MinGap          int     // 障碍物之间的最小间距（屏幕单位）
+	MaxGap          int     // 障碍物之间的最大间距（屏幕单位）
 }
 
 // stageConfigs lists the stages in ascending order of score threshold.
 var stageConfigs = []StageConfig{
-	{ScoreThreshold: 0, Speed: 1.4, BirdProb: 0.1, BigBirdProb: 0.05, GroupCactusProb: 0.15},
-	{ScoreThreshold: 100, Speed: 1.4, BirdProb: 0.1, BigBirdProb: 0.05, GroupCactusProb: 0.15},
-	{ScoreThreshold: 300, Speed: 2.0, BirdProb: 0.3, BigBirdProb: 0.1, GroupCactusProb: 0.25},
-	{ScoreThreshold: 600, Speed: 2.0, BirdProb: 0.3, BigBirdProb: 0.1, GroupCactusProb: 0.25},
-	{ScoreThreshold: 1000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
-	{ScoreThreshold: 1500, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
-	{ScoreThreshold: 2000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
-	{ScoreThreshold: 2500, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
-	{ScoreThreshold: 3000, Speed: 3.0, BirdProb: 0.5, BigBirdProb: 0.2, GroupCactusProb: 0.35},
+	{ScoreThreshold: 0, Speed: 1.2, BirdProb: 0.05, BigBirdProb: 0.01, GroupCactusProb: 0.10, MinGap: 50, MaxGap: 80},
+	{ScoreThreshold: 100, Speed: 1.4, BirdProb: 0.10, BigBirdProb: 0.03, GroupCactusProb: 0.15, MinGap: 50, MaxGap: 70},
+	{ScoreThreshold: 300, Speed: 1.6, BirdProb: 0.15, BigBirdProb: 0.05, GroupCactusProb: 0.20, MinGap: 40, MaxGap: 65},
+	{ScoreThreshold: 600, Speed: 1.8, BirdProb: 0.20, BigBirdProb: 0.08, GroupCactusProb: 0.25, MinGap: 40, MaxGap: 60},
+	{ScoreThreshold: 1000, Speed: 2.0, BirdProb: 0.25, BigBirdProb: 0.10, GroupCactusProb: 0.30, MinGap: 30, MaxGap: 58},
+	{ScoreThreshold: 1500, Speed: 2.3, BirdProb: 0.30, BigBirdProb: 0.15, GroupCactusProb: 0.30, MinGap: 30, MaxGap: 55},
+	{ScoreThreshold: 2000, Speed: 2.6, BirdProb: 0.40, BigBirdProb: 0.18, GroupCactusProb: 0.35, MinGap: 25, MaxGap: 50},
+	{ScoreThreshold: 2500, Speed: 2.8, BirdProb: 0.45, BigBirdProb: 0.20, GroupCactusProb: 0.35, MinGap: 25, MaxGap: 45},
+	{ScoreThreshold: 3000, Speed: 3.0, BirdProb: 0.50, BigBirdProb: 0.25, GroupCactusProb: 0.40, MinGap: 20, MaxGap: 40},
 }
 
 // duration of smooth transition between stages
@@ -264,3 +266,14 @@ const (
 
 // group cactus appearance probability (default value, will be overridden by stage config)
 var groupCactusProbability = 0.25
+
+// 障碍物组合配置
+type ObstacleCombination struct {
+	Type1    ObstacleType // 第一个障碍物类型
+	Type2    ObstacleType // 第二个障碍物类型（可选）
+	Gap      int          // 两个障碍物之间的间距（如果有第二个障碍物）
+	HasCombo bool         // 是否是组合障碍物
+}
+
+// 障碍物组合概率（随着难度增加）
+var obstacleComboProbability = 0.0

@@ -179,47 +179,131 @@ func (b *BigBird) getFrameCount() int {
 
 // ObstacleManager manages the creation and updating of obstacles
 type ObstacleManager struct {
-	currentObstacle IObstacle
+	obstacles    []IObstacle // 存储多个障碍物
+	nextGapTimer int         // 下一个障碍物生成前的计时器
+	minGap       int         // 当前阶段的最小间距
+	maxGap       int         // 当前阶段的最大间距
+	currentStage int         // 当前游戏阶段
 }
 
 // NewObstacleManager creates a new obstacle manager
 func NewObstacleManager() *ObstacleManager {
-	om := &ObstacleManager{}
+	om := &ObstacleManager{
+		obstacles:    make([]IObstacle, 0, 5), // 预分配5个障碍物的空间
+		minGap:       stageConfigs[0].MinGap,
+		maxGap:       stageConfigs[0].MaxGap,
+		nextGapTimer: 0,
+		currentStage: 0,
+	}
+	// 生成第一个障碍物
 	om.generateNewObstacle()
 	return om
 }
 
-// Update updates the current obstacle and generates a new one if needed
+// Update updates all obstacles and generates new ones if needed
 func (om *ObstacleManager) Update() {
-	om.currentObstacle.Update()
-	x, _ := om.currentObstacle.GetPosition()
-	if x < 0 {
+	// 更新所有现有障碍物
+	for i := 0; i < len(om.obstacles); i++ {
+		om.obstacles[i].Update()
+
+		// 如果障碍物已经完全移出屏幕左侧，从列表中移除
+		x, _ := om.obstacles[i].GetPosition()
+		if x < -10 { // 使用-10确保障碍物完全离开屏幕
+			// 移除障碍物（通过将最后一个元素移到当前位置，然后缩小切片）
+			om.obstacles[i] = om.obstacles[len(om.obstacles)-1]
+			om.obstacles = om.obstacles[:len(om.obstacles)-1]
+			i-- // 调整索引，因为我们刚刚替换了当前元素
+		}
+	}
+
+	// 计时器逻辑，决定何时生成新障碍物
+	if om.nextGapTimer > 0 {
+		om.nextGapTimer--
+		if om.nextGapTimer <= 0 {
+			om.generateNewObstacle()
+		}
+	} else if len(om.obstacles) == 0 {
+		// 如果没有障碍物，立即生成一个
 		om.generateNewObstacle()
 	}
 }
 
-// Draw renders the current obstacle
-func (om *ObstacleManager) Draw() {
-	om.currentObstacle.Draw()
+// UpdateStageGaps updates the gap parameters based on current stage
+func (om *ObstacleManager) UpdateStageGaps(minGap, maxGap int, stageIndex int) {
+	om.minGap = minGap
+	om.maxGap = maxGap
+	om.currentStage = stageIndex
 }
 
-// GetCurrentObstacle returns the current active obstacle
-func (om *ObstacleManager) GetCurrentObstacle() IObstacle {
-	return om.currentObstacle
+// Draw renders all obstacles
+func (om *ObstacleManager) Draw() {
+	for _, obstacle := range om.obstacles {
+		obstacle.Draw()
+	}
+}
+
+// GetObstacles returns all active obstacles for collision detection
+func (om *ObstacleManager) GetObstacles() []IObstacle {
+	return om.obstacles
 }
 
 // generateNewObstacle creates a new obstacle based on probabilities
 func (om *ObstacleManager) generateNewObstacle() {
+	var newObstacle IObstacle
+
+	// 根据当前游戏阶段动态调整障碍物生成逻辑
+	maxObstaclesOnScreen := 3
+	if om.currentStage <= 1 { // 初始阶段（0-100分）
+		maxObstaclesOnScreen = 1 // 前期最多只有1个障碍物在屏幕上
+	} else if om.currentStage <= 3 { // 中期阶段（100-600分）
+		maxObstaclesOnScreen = 2 // 中期最多有2个障碍物
+	}
+
+	// 检查屏幕上已有的障碍物数量，如果超过阈值，延迟生成新障碍物
+	if len(om.obstacles) >= maxObstaclesOnScreen {
+		// 增加间隔时间，确保障碍物不会过于密集
+		om.nextGapTimer = om.maxGap
+		return
+	}
+
 	r := rand.Float64()
 	if r < bigBirdProbability {
-		om.currentObstacle = NewBigBird()
+		newObstacle = NewBigBird()
 	} else if r < bigBirdProbability+birdProbability {
-		om.currentObstacle = NewBird()
+		newObstacle = NewBird()
 	} else if r < bigBirdProbability+birdProbability+groupCactusProbability {
-		om.currentObstacle = NewGroupCactus()
+		newObstacle = NewGroupCactus()
 	} else {
-		om.currentObstacle = NewCactus()
+		newObstacle = NewCactus()
 	}
+
+	// 添加到障碍物列表
+	om.obstacles = append(om.obstacles, newObstacle)
+
+	// 设置下一个障碍物的生成间隔
+	// 根据游戏阶段调整间隔生成策略
+	var gapMultiplier float64 = 1.0
+	if om.currentStage <= 1 {
+		// 初始阶段，使用更大的间隔
+		gapMultiplier = 1.5
+	} else if om.currentStage <= 3 {
+		// 中期阶段，使用稍大的间隔
+		gapMultiplier = 1.2
+	}
+
+	// 使用加权随机，更倾向于选择较大的间隔值
+	gapRange := om.maxGap - om.minGap + 1
+	weightedGap := om.minGap + int(float64(gapRange)*rand.Float64()*rand.Float64())
+
+	// 应用阶段乘数
+	weightedGap = int(float64(weightedGap) * gapMultiplier)
+
+	// 确保不超过最大间隔
+	if weightedGap > int(float64(om.maxGap)*1.5) {
+		weightedGap = int(float64(om.maxGap) * 1.5)
+	}
+
+	om.nextGapTimer = weightedGap
 }
 
 // GroupCactus represents a group of connected cacti obstacle
