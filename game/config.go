@@ -127,14 +127,68 @@ var bigBirdFrames = []Sprite{
 	},
 }
 
+// Cloud sprites with different shapes
+var cloudSprites = []Sprite{
+	{
+		"   .--.    ",
+		" .(    ).  ",
+		"(___.__)  ",
+	},
+	{
+		"  .-.      ",
+		" (   ).    ",
+		"(___(__)  ",
+	},
+	{
+		"    .--.   ",
+		".-(    )-. ",
+		"(________) ",
+	},
+}
+
 // bird appearance probability
 var birdProbability = 0.3
 
 // big bird appearance probability
 var bigBirdProbability = 0.15
 
+// bird flight height (row index) above bottom of screen
+const birdFlightRow = 9
+
 // big bird flight height (row index) above bottom of screen
 const bigBirdFlightRow = 7
+
+// —— 云朵配置参数 ——
+
+// 云朵最小高度（行号，从上往下计数）
+const cloudMinHeight = 1
+
+// 云朵最大高度（行号，从上往下计数）
+const cloudMaxHeight = 3
+
+// 云朵最小移动速度
+const cloudMinSpeed = 0.2
+
+// 云朵最大移动速度
+const cloudMaxSpeed = 0.5
+
+// 初始云朵最小数量
+const cloudMinCount = 3
+
+// 初始云朵最大数量
+const cloudMaxCount = 3
+
+// 云朵右侧边缘缓冲区大小
+const cloudRightEdgeBuffer = 15
+
+// 云朵最小额外间距
+const cloudMinExtraSpace = 10
+
+// 云朵最大额外间距
+const cloudMaxExtraSpace = 25
+
+// 云朵之间的最小缓冲区大小
+const cloudBufferSpace = 5
 
 // StageConfig defines dynamic game parameters per stage based on score.
 type StageConfig struct {
@@ -153,9 +207,6 @@ var stageConfigs = []StageConfig{
 
 // duration of smooth transition between stages
 var stageTransitionDuration = 3000 * time.Millisecond
-
-// bird flight height (row index) above bottom of screen
-const birdFlightRow = 9
 
 // Key bindings
 const (

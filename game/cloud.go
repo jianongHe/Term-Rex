@@ -21,29 +21,10 @@ type CloudManager struct {
 	maxClouds int
 }
 
-// Cloud sprites with different shapes
-var cloudSprites = []Sprite{
-	{
-		"   .--.    ",
-		" .(    ).  ",
-		"(___.__)  ",
-	},
-	{
-		"  .-.      ",
-		" (   ).    ",
-		"(___(__)  ",
-	},
-	{
-		"    .--.   ",
-		".-(    )-. ",
-		"(________) ",
-	},
-}
-
 // NewCloudManager creates a new cloud manager with initial clouds
 func NewCloudManager() *CloudManager {
 	cm := &CloudManager{
-		maxClouds: 3 + rand.Intn(3), // 3-5 clouds
+		maxClouds: cloudMinCount + rand.Intn(cloudMaxCount-cloudMinCount+1),
 	}
 
 	// Create initial clouds with good spacing
@@ -64,7 +45,7 @@ func NewCloudManager() *CloudManager {
 			hasSpace := true
 
 			// Check if there's enough space (with buffer)
-			buffer := cloudWidth + 5 // Add buffer space between clouds
+			buffer := cloudWidth + cloudBufferSpace
 			for j := startPos - buffer/2; j < startPos+buffer/2; j++ {
 				if j >= 0 && j < width && !availablePositions[j] {
 					hasSpace = false
@@ -87,9 +68,9 @@ func NewCloudManager() *CloudManager {
 		// Create cloud at this position
 		cm.clouds = append(cm.clouds, &Cloud{
 			posX:      float64(startPos),
-			y:         2 + rand.Intn(4), // Random height in the sky (rows 2-5)
+			y:         cloudMinHeight + rand.Intn(cloudMaxHeight-cloudMinHeight+1),
 			width:     cloudWidth,
-			speed:     0.2 + rand.Float64()*0.3, // Random speed between 0.2-0.5
+			speed:     cloudMinSpeed + rand.Float64()*(cloudMaxSpeed-cloudMinSpeed),
 			cloudType: cloudType,
 		})
 	}
@@ -103,11 +84,10 @@ func (cm *CloudManager) createNewCloud() *Cloud {
 	cloudWidth := len(cloudSprites[cloudType][0])
 
 	// Check if there's already a cloud near the right edge
-	rightEdgeBuffer := 15 // Buffer space to check near right edge
 	hasNearbyCloud := false
 
 	for _, cloud := range cm.clouds {
-		if cloud.x > width-rightEdgeBuffer {
+		if cloud.x > width-cloudRightEdgeBuffer {
 			hasNearbyCloud = true
 			break
 		}
@@ -116,14 +96,14 @@ func (cm *CloudManager) createNewCloud() *Cloud {
 	// If there's a cloud near the right edge, add extra spacing
 	extraSpace := 0
 	if hasNearbyCloud {
-		extraSpace = 10 + rand.Intn(15) // Add 10-25 extra spaces
+		extraSpace = cloudMinExtraSpace + rand.Intn(cloudMaxExtraSpace-cloudMinExtraSpace+1)
 	}
 
 	return &Cloud{
 		posX:      float64(width + extraSpace),
-		y:         2 + rand.Intn(4), // Random height in the sky (rows 2-5)
+		y:         cloudMinHeight + rand.Intn(cloudMaxHeight-cloudMinHeight+1),
 		width:     cloudWidth,
-		speed:     0.2 + rand.Float64()*0.3, // Random speed between 0.2-0.5
+		speed:     cloudMinSpeed + rand.Float64()*(cloudMaxSpeed-cloudMinSpeed),
 		cloudType: cloudType,
 	}
 }
