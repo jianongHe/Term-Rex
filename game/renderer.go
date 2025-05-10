@@ -14,6 +14,13 @@ func DrawGround() {
 	}
 }
 
+// drawGroundPartial draws ground between current Game boundaries.
+func (g *Game) drawGroundPartial() {
+	for x := g.groundStart; x <= g.groundEnd; x++ {
+		termbox.SetCell(x, height-1, '_', termbox.ColorWhite, termbox.ColorDefault)
+	}
+}
+
 // PrintCenter prints a message at center of screen
 func PrintCenter(msg string) {
 	x := (width - len(msg)) / 2

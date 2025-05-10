@@ -1,0 +1,44 @@
+package game
+
+import "time"
+
+// applyStage smoothly transitions parameters based on score threshold crossings.
+func (g *Game) applyStage() {
+	// determine target stage for current score
+	target := 0
+	for i := len(stageConfigs) - 1; i >= 0; i-- {
+		if g.score >= stageConfigs[i].ScoreThreshold {
+			target = i
+			break
+		}
+	}
+	// on first crossing, start transition
+	if target != g.stageIndexTarget {
+		g.stageIndexTarget = target
+		g.stageTransitionStart = time.Now()
+	}
+	// if currently transitioning between two stages
+	if g.stageIndexActive != g.stageIndexTarget {
+		elapsed := time.Since(g.stageTransitionStart)
+		frac := float64(elapsed) / float64(stageTransitionDuration)
+		if frac >= 1 {
+			// finish transition
+			g.stageIndexActive = g.stageIndexTarget
+			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed
+			birdProbability = stageConfigs[g.stageIndexActive].BirdProb
+			g.stageTransitionStart = time.Time{}
+		} else {
+			// interpolate between active and target
+			old := stageConfigs[g.stageIndexActive]
+			next := stageConfigs[g.stageIndexTarget]
+			speed := old.Speed + frac*(next.Speed-old.Speed)
+			obstacleSpeed = speed
+			birdProbability = old.BirdProb + frac*(next.BirdProb-old.BirdProb)
+		}
+	} else {
+		// no transition: keep active stage values
+		sc := stageConfigs[g.stageIndexActive]
+		obstacleSpeed = sc.Speed
+		birdProbability = sc.BirdProb
+	}
+}

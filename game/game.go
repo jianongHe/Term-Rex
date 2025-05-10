@@ -4,114 +4,8 @@ import (
 	"fmt"
 	"github.com/nsf/termbox-go"
 	"math"
-	"os"
 	"time"
 )
-
-// applyStage smoothly transitions parameters based on score threshold crossings.
-func (g *Game) applyStage() {
-	// determine target stage for current score
-	target := 0
-	for i := len(stageConfigs) - 1; i >= 0; i-- {
-		if g.score >= stageConfigs[i].ScoreThreshold {
-			target = i
-			break
-		}
-	}
-	// on first crossing, start transition
-	if target != g.stageIndexTarget {
-		g.stageIndexTarget = target
-		g.stageTransitionStart = time.Now()
-	}
-	// if currently transitioning between two stages
-	if g.stageIndexActive != g.stageIndexTarget {
-		elapsed := time.Since(g.stageTransitionStart)
-		frac := float64(elapsed) / float64(stageTransitionDuration)
-		if frac >= 1 {
-			// finish transition
-			g.stageIndexActive = g.stageIndexTarget
-			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed
-			birdProbability = stageConfigs[g.stageIndexActive].BirdProb
-			g.stageTransitionStart = time.Time{}
-		} else {
-			// interpolate between active and target
-			old := stageConfigs[g.stageIndexActive]
-			next := stageConfigs[g.stageIndexTarget]
-			speed := old.Speed + frac*(next.Speed-old.Speed)
-			obstacleSpeed = speed
-			birdProbability = old.BirdProb + frac*(next.BirdProb-old.BirdProb)
-		}
-	} else {
-		// no transition: keep active stage values
-		sc := stageConfigs[g.stageIndexActive]
-		obstacleSpeed = sc.Speed
-		birdProbability = sc.BirdProb
-	}
-}
-
-// checkCollision returns true if the dino and obstacle sprites overlap on non-space chars.
-func (g *Game) checkCollision() bool {
-	// Determine Dino sprite and bounds
-	var dSprite Sprite
-	onGround := int(g.dino.posY) == height-2
-	if !onGround {
-		dSprite = dinoStandFrames[0]
-	} else if g.dino.duckFrames > 0 {
-		dSprite = dinoDuckFrames[g.dino.animFrame]
-	} else {
-		dSprite = dinoStandFrames[g.dino.animFrame]
-	}
-	dW := len(dSprite[0])
-	dH := len(dSprite)
-	dX0 := g.dino.X
-	dY0 := int(g.dino.posY) - (dH - 1)
-
-	// Determine Obstacle sprite and bounds
-	var oSprite Sprite
-	if g.obstacle.isBird {
-		oSprite = birdFrames[g.obstacle.animFrame]
-	} else {
-		oSprite = obstacleFrames[g.obstacle.animFrame]
-	}
-	oW := len(oSprite[0])
-	oH := len(oSprite)
-	oX0 := int(math.Round(g.obstacle.posX))
-	oY0 := g.obstacle.Y - (oH - 1)
-
-	// Compute overlap rectangle
-	xStart := max(dX0, oX0)
-	xEnd := min(dX0+dW-1, oX0+oW-1)
-	yStart := max(dY0, oY0)
-	yEnd := min(dY0+dH-1, oY0+oH-1)
-
-	// Check each overlapping cell: collision only if both chars are non-space
-	for y := yStart; y <= yEnd; y++ {
-		for x := xStart; x <= xEnd; x++ {
-			dx := x - dX0
-			dy := y - dY0
-			ox := x - oX0
-			oy := y - oY0
-			if dSprite[dy][dx] != ' ' && oSprite[oy][ox] != ' ' {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-// helper min and max
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
 
 // SetWidth updates game width based on terminal size
 func SetWidth(w int) {
@@ -170,69 +64,43 @@ func NewGame() *Game {
 	}
 }
 
-// handleEvent processes a single input event
-func (g *Game) handleEvent(ev termbox.Event) bool {
-	if ev.Type == termbox.EventKey {
-		switch ev.Key {
-		case KeyJump, KeyJumpAlt:
-			if !g.started {
-				g.started = true
-				g.groundExtending = true
-			}
-			g.dino.Jump()
-			// cancel duck when jumping
-			g.dino.duckFrames = 0
-		case KeyDuck:
-			// only allow ducking when on ground
-			if g.started && int(g.dino.posY) == height-2 {
-				g.dino.duckFrames = duckHoldDuration
-			}
-		case KeyQuit:
-			return false
-		}
-		if ev.Ch == KeyQuitRune {
-			return false
-		}
-	}
-	return true
+// drawStartScreen renders the initial start prompt and partial ground
+func (g *Game) drawStartScreen() {
+	g.drawGroundPartial()
+	// draw the dinosaur at its starting position
+	g.dino.Draw()
+	PrintCenter("Press Space or Up Arrow to Start")
 }
 
-// update updates game state
-func (g *Game) update() {
-	g.dino.Update()
-	if g.started {
-		g.applyStage()
-		g.obstacle.Update()
-		if g.checkCollision() {
-			g.gameOver()
-		}
-		if g.groundExtending {
-			g.updateGround()
-			// stop extending once ground fully spans screen
-			if g.groundStart == 0 && g.groundEnd == width-1 {
-				g.groundExtending = false
-			}
-		}
+// drawGameScene renders the full game scene after start
+func (g *Game) drawGameScene() {
+	// ground
+	if g.groundExtending {
+		g.drawGroundPartial()
+	} else {
+		DrawGround()
+	}
+	// dino
+	g.dino.Draw()
+	// obstacle
+	xPos := int(math.Round(g.obstacle.posX))
+	if xPos >= g.groundStart && xPos <= g.groundEnd {
+		g.obstacle.Draw()
 	}
 }
 
 // draw renders the current game state
 func (g *Game) draw() {
 	ClearScreen()
-	// display score and quit hint
+	// score and quit hint
 	PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
-	g.drawGround()
-	g.dino.Draw()
 	if !g.started {
-		PrintCenter("Press Space or Up Arrow to Start")
+		g.drawStartScreen()
 		termbox.Flush()
 		return
 	}
-	// only draw obstacle if it is on extended ground
-	xPos := int(math.Round(g.obstacle.posX))
-	if xPos >= g.groundStart && xPos <= g.groundEnd {
-		g.obstacle.Draw()
-	}
+	// main game view
+	g.drawGameScene()
 	termbox.Flush()
 }
 
@@ -251,51 +119,5 @@ func (g *Game) Run() {
 			g.score++
 		}
 		g.draw()
-	}
-}
-
-// gameOver displays game over screen and waits for restart or quit
-func (g *Game) gameOver() {
-	// overlay Game Over and options
-	PrintCenter("GAME OVER (r to retry, q to quit)")
-	termbox.Flush()
-	for {
-		ev := <-g.events
-		if ev.Type == termbox.EventKey {
-			if ev.Ch == KeyRestartRune {
-				// reset game state
-				g.dino = NewDino()
-				g.obstacle = NewObstacle()
-				g.score = 0
-				return
-			}
-			if ev.Key == KeyQuit || ev.Ch == KeyQuitRune {
-				termbox.Close()
-				os.Exit(0)
-			}
-		}
-	}
-}
-
-// updateGround expands the ground boundaries until filling the screen.
-func (g *Game) updateGround() {
-	if g.groundStart > 0 {
-		g.groundStart -= groundExtendSpeed
-		if g.groundStart < 0 {
-			g.groundStart = 0
-		}
-	}
-	if g.groundEnd < width-1 {
-		g.groundEnd += groundExtendSpeed
-		if g.groundEnd > width-1 {
-			g.groundEnd = width - 1
-		}
-	}
-}
-
-// drawGround draws ground only between the current boundaries.
-func (g *Game) drawGround() {
-	for x := g.groundStart; x <= g.groundEnd; x++ {
-		termbox.SetCell(x, height-1, '_', termbox.ColorWhite, termbox.ColorDefault)
 	}
 }
