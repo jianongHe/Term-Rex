@@ -1,0 +1,13 @@
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+*.iws
+.idea_modules/
+
+# Other common files to ignore
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
