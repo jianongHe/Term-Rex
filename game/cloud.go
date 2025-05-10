@@ -13,18 +13,21 @@ type Cloud struct {
 	speed     float64
 	posX      float64
 	cloudType int
+	color     termbox.Attribute
 }
 
 // CloudManager manages multiple clouds in the sky
 type CloudManager struct {
 	clouds    []*Cloud
 	maxClouds int
+	colors    []termbox.Attribute
 }
 
 // NewCloudManager creates a new cloud manager with initial clouds
 func NewCloudManager() *CloudManager {
 	cm := &CloudManager{
 		maxClouds: cloudMinCount + rand.Intn(cloudMaxCount-cloudMinCount+1),
+		colors:    []termbox.Attribute{termbox.ColorWhite},
 	}
 
 	// Create initial clouds with good spacing
@@ -65,13 +68,15 @@ func NewCloudManager() *CloudManager {
 			}
 		}
 
-		// Create cloud at this position
+		// Create cloud at this position with random color
 		cm.clouds = append(cm.clouds, &Cloud{
 			posX:      float64(startPos),
+			x:         startPos, // Explicitly set x to match posX initially
 			y:         cloudMinHeight + rand.Intn(cloudMaxHeight-cloudMinHeight+1),
 			width:     cloudWidth,
 			speed:     cloudMinSpeed + rand.Float64()*(cloudMaxSpeed-cloudMinSpeed),
 			cloudType: cloudType,
+			color:     cm.colors[rand.Intn(len(cm.colors))],
 		})
 	}
 
@@ -99,12 +104,17 @@ func (cm *CloudManager) createNewCloud() *Cloud {
 		extraSpace = cloudMinExtraSpace + rand.Intn(cloudMaxExtraSpace-cloudMinExtraSpace+1)
 	}
 
+	// Position the new cloud completely off-screen to the right
+	newX := width + extraSpace
+
 	return &Cloud{
-		posX:      float64(width + extraSpace),
+		posX:      float64(newX),
+		x:         newX, // Explicitly set x to match posX initially
 		y:         cloudMinHeight + rand.Intn(cloudMaxHeight-cloudMinHeight+1),
 		width:     cloudWidth,
 		speed:     cloudMinSpeed + rand.Float64()*(cloudMaxSpeed-cloudMinSpeed),
 		cloudType: cloudType,
+		color:     cm.colors[rand.Intn(len(cm.colors))],
 	}
 }
 
@@ -115,7 +125,7 @@ func (cm *CloudManager) Update() {
 		cloud.x = int(cloud.posX)
 
 		// If cloud has moved completely off-screen to the left
-		if cloud.x+cloud.width < 0 {
+		if cloud.x+cloud.width < -5 { // Add extra buffer to ensure it's fully off-screen
 			// Create a new cloud at the right edge of the screen with proper spacing
 			cm.clouds[i] = cm.createNewCloud()
 		}
@@ -125,6 +135,11 @@ func (cm *CloudManager) Update() {
 // Draw renders all clouds on the screen
 func (cm *CloudManager) Draw() {
 	for _, cloud := range cm.clouds {
+		// Skip drawing if the cloud is completely off-screen
+		if cloud.x+cloud.width < 0 || cloud.x > width {
+			continue
+		}
+
 		// Draw all clouds regardless of game state or ground extension
 		sprite := cloudSprites[cloud.cloudType]
 		for y, line := range sprite {
