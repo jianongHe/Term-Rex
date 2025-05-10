@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"github.com/nsf/termbox-go"
+	"os"
 	"time"
 )
 
@@ -113,14 +114,25 @@ func (g *Game) Run() {
 	}
 }
 
-// gameOver displays game over screen and waits for quit
+// gameOver displays game over screen and waits for restart or quit
 func (g *Game) gameOver() {
-	ClearScreen()
-	PrintCenter("GAME OVER (press q)")
+	// overlay Game Over and options
+	PrintCenter("GAME OVER (r to retry, q to quit)")
 	termbox.Flush()
-	for ev := range g.events {
-		if ev.Type == termbox.EventKey && (ev.Key == termbox.KeyEsc || ev.Ch == 'q') {
-			return
+	for {
+		ev := <-g.events
+		if ev.Type == termbox.EventKey {
+			if ev.Ch == KeyRestartRune {
+				// reset game state
+				g.dino = NewDino()
+				g.obstacle = NewObstacle()
+				g.score = 0
+				return
+			}
+			if ev.Key == KeyQuit || ev.Ch == KeyQuitRune {
+				termbox.Close()
+				os.Exit(0)
+			}
 		}
 	}
 }

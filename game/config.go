@@ -59,4 +59,6 @@ const (
 // Character key bindings
 const (
 	KeyQuitRune = 'q' // alternate quit
+	// restart game
+	KeyRestartRune = 'r'
 )
