@@ -16,6 +16,7 @@ const (
 	SoundJump      = "jump"
 	SoundCollision = "collision"
 	SoundScore     = "score"
+	SoundDrop      = "drop" // 新增：快速下降音效
 )
 
 // AudioManager 管理游戏音效
@@ -68,6 +69,13 @@ func (am *AudioManager) Initialize() error {
 	}
 
 	err = am.loadSound(SoundScore, "assets/sounds/score.wav")
+	if err != nil {
+		return err
+	}
+
+	// 加载快速下降音效 - 暂时复用跳跃音效
+	// 如果有专门的下降音效文件，可以替换为实际路径
+	err = am.loadSound(SoundDrop, "assets/sounds/jump.mp3")
 	if err != nil {
 		return err
 	}

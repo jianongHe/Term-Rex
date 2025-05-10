@@ -9,6 +9,11 @@ import (
 
 // update updates game state
 func (g *Game) update() {
+	// 如果下键被按住，确保恐龙知道这一点
+	if g.downKeyHeld {
+		g.dino.isDownKeyPressed = true
+	}
+
 	g.dino.Update()
 	g.cloudManager.Update() // Update clouds regardless of game state
 

@@ -255,6 +255,7 @@ const (
 	KeyJumpAlt = termbox.KeyArrowUp   // alternate jump action
 	KeyDuck    = termbox.KeyArrowDown // duck action
 	KeyQuit    = termbox.KeyEsc       // quit action
+	KeyRelease = termbox.KeyArrowDown // 用于检测下键释放（实际上是同一个键）
 )
 
 // Character key bindings

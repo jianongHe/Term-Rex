@@ -18,6 +18,7 @@ func SetWidth(w int) {
 type Game struct {
 	dino                 *Dino
 	obstacleManager      *ObstacleManager
+	downKeyHeld          bool // 添加一个字段来跟踪下键状态
 	cloudManager         *CloudManager
 	ticker               *time.Ticker
 	events               chan termbox.Event
@@ -81,6 +82,7 @@ func NewGame() *Game {
 		groundEnd:            ge,
 		started:              false,
 		groundExtending:      false,
+		downKeyHeld:          false,
 		stageIndexActive:     0,
 		stageIndexTarget:     0,
 		stageTransitionStart: time.Time{},
@@ -183,6 +185,44 @@ func (g *Game) draw() {
 	termbox.Flush()
 }
 
+// Reset resets the game state for a new game
+func (g *Game) Reset() {
+	// 重置恐龙
+	g.dino = NewDino()
+
+	// 重置障碍物管理器
+	g.obstacleManager = NewObstacleManager()
+
+	// 重置云朵管理器
+	g.cloudManager = NewCloudManager()
+
+	// 重置分数
+	g.score = 0
+
+	// 重置游戏状态
+	g.started = true
+	g.groundExtending = true
+	g.collided = false
+	g.downKeyHeld = false
+
+	// 重置阶段
+	g.stageIndexActive = 0
+	g.stageIndexTarget = 0
+	g.stageTransitionStart = time.Time{}
+
+	// 重置分数闪烁状态
+	g.scoreBlinking = false
+	g.scoreBlinkStart = time.Time{}
+	g.scoreBlinkVisible = true
+	g.lastBlinkToggle = time.Time{}
+}
+
+// TogglePause toggles the game's paused state
+func (g *Game) TogglePause() {
+	// 暂停/继续游戏的逻辑
+	// 这里可以添加暂停功能的实现
+}
+
 // Run starts the game loop
 func (g *Game) Run() {
 	// 初始化音频系统
@@ -190,13 +230,44 @@ func (g *Game) Run() {
 
 	lastScoreMilestone := 0
 
+	// 用于跟踪下键状态的变量
+	lastKeyPressTime := time.Now()
+	keyCheckInterval := 100 * time.Millisecond
+
 	for range g.ticker.C {
-		select {
-		case ev := <-g.events:
-			if !g.handleEvent(ev) {
-				return
+		// 定期检查是否有按键事件
+		// 如果一段时间内没有收到下键的按键事件，则认为下键已释放
+		if g.downKeyHeld && time.Since(lastKeyPressTime) > keyCheckInterval {
+			// 检查是否有新的按键事件
+			select {
+			case ev := <-g.events:
+				if ev.Type == termbox.EventKey && ev.Key == KeyDuck {
+					// 如果是下键，更新最后按键时间
+					lastKeyPressTime = time.Now()
+				} else {
+					// 如果是其他键或非按键事件，处理它
+					if !g.handleEvent(ev) {
+						return
+					}
+				}
+			default:
+				// 如果没有新的按键事件，认为下键已释放
+				g.downKeyHeld = false
+				g.dino.isDownKeyPressed = false
 			}
-		default:
+		} else {
+			// 正常处理按键事件
+			select {
+			case ev := <-g.events:
+				if ev.Type == termbox.EventKey && ev.Key == KeyDuck {
+					// 如果是下键，更新最后按键时间
+					lastKeyPressTime = time.Now()
+				}
+				if !g.handleEvent(ev) {
+					return
+				}
+			default:
+			}
 		}
 		g.update()
 		if g.collided {
