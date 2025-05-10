@@ -10,12 +10,15 @@ import (
 // SetWidth updates game width based on terminal size
 func SetWidth(w int) {
 	width = w
+	// Reinitialize ground decorations when width changes
+	InitGroundDecorations()
 }
 
 // Game holds all state
 type Game struct {
 	dino                 *Dino
 	obstacleManager      *ObstacleManager
+	cloudManager         *CloudManager
 	ticker               *time.Ticker
 	events               chan termbox.Event
 	score                int
@@ -50,9 +53,14 @@ func NewGame() *Game {
 	if ge > width-1 {
 		ge = width - 1
 	}
+
+	// Initialize ground decorations
+	InitGroundDecorations()
+
 	return &Game{
 		dino:                 d,
 		obstacleManager:      NewObstacleManager(),
+		cloudManager:         NewCloudManager(),
 		ticker:               time.NewTicker(tickDuration),
 		events:               events,
 		score:                0,
@@ -68,22 +76,33 @@ func NewGame() *Game {
 
 // drawStartScreen renders the initial start prompt and partial ground
 func (g *Game) drawStartScreen() {
+	// Draw clouds first (always across the entire sky)
+	g.cloudManager.Draw()
+
+	// Draw partial ground
 	g.drawGroundPartial()
-	// draw the dinosaur at its starting position
+
+	// Draw the dinosaur at its starting position
 	g.dino.Draw()
+
 	PrintCenter("Press Space or Up Arrow to Start")
 }
 
 // drawGameScene renders the full game scene after start
 func (g *Game) drawGameScene() {
+	// Draw clouds first (always across the entire sky)
+	g.cloudManager.Draw()
+
 	// ground
 	if g.groundExtending {
 		g.drawGroundPartial()
 	} else {
 		DrawGround()
 	}
+
 	// dino
 	g.dino.Draw()
+
 	// obstacle
 	obstacle := g.obstacleManager.GetCurrentObstacle()
 	x, _ := obstacle.GetPosition()

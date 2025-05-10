@@ -10,6 +10,8 @@ import (
 // update updates game state
 func (g *Game) update() {
 	g.dino.Update()
+	g.cloudManager.Update() // Update clouds regardless of game state
+
 	if g.started {
 		g.applyStage()
 		g.obstacleManager.Update()
@@ -41,6 +43,7 @@ func (g *Game) gameOver() {
 				// reset game state
 				g.dino = NewDino()
 				g.obstacleManager = NewObstacleManager()
+				// Don't reset clouds, just let them continue
 				g.score = 0
 				// reset stage progression and parameters
 				g.stageIndexActive = 0
