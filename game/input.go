@@ -21,6 +21,8 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 			}
 		case KeyQuit:
 			return false
+		case termbox.KeyCtrlC: // 添加对 Ctrl+C 的处理
+			return false
 		}
 
 		// 处理字符键

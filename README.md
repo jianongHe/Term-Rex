@@ -24,6 +24,7 @@ A terminal-based dinosaur runner game inspired by the Chrome offline game, imple
 - **Down Arrow**: Duck (crouch to avoid flying obstacles)
 - **p**: Pause/Unpause the game
 - **q** or **Esc**: Quit the game
+- **Ctrl+C**: Quit the game (standard terminal interrupt)
 - **r**: Restart after game over
 - **m**: Toggle sound effects on/off
 
