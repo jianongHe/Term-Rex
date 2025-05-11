@@ -58,7 +58,7 @@ func (g *Game) handleEvent(ev termbox.Event) bool {
 			if g.collided {
 				g.Reset()
 			}
-		case 'p': // 暂停/继续游戏
+		case KeyPauseRune: // 暂停/继续游戏
 			if g.started && !g.collided {
 				g.TogglePause()
 			}

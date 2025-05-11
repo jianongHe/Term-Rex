@@ -27,6 +27,7 @@ type Game struct {
 	groundStart              int
 	groundEnd                int
 	started                  bool
+	pause                    bool
 	groundExtending          bool
 	collided                 bool // indicates collision occurred
 	stageIndexActive         int
@@ -83,6 +84,7 @@ func NewGame() *Game {
 		groundStart:              gs,
 		groundEnd:                ge,
 		started:                  false,
+		pause:                    false,
 		groundExtending:          false,
 		downKeyHeld:              false,
 		stageIndexActive:         0,
@@ -168,24 +170,26 @@ func (g *Game) draw() {
 		PrintAt(0, 0, fmt.Sprintf("Score: %d  (Q to quit)", g.score))
 	}
 
-	// 显示音效状态
-	//soundStatus := "Sound: ON (m)"
-	//if !GetAudioManager().IsEnabled() {
-	//	soundStatus = "Sound: OFF (m)"
-	//}
-	//PrintAt(width/2-len(soundStatus)/2, 0, soundStatus)
-
 	// 始终显示最高分，即使是0
 	hsText := fmt.Sprintf("High: %d", g.highestScore)
 	x := width - len(hsText)
 	PrintAt(x, 0, hsText)
+
 	if !g.started {
 		g.drawStartScreen()
 		termbox.Flush()
 		return
 	}
+
 	// main game view
 	g.drawGameScene()
+
+	// Show pause indicator if game is paused
+	if g.pause && !g.collided {
+		PrintCenter("PAUSED")
+		PrintCenterAt("Press 'P' to resume", height/2+2)
+	}
+
 	termbox.Flush()
 }
 
@@ -224,8 +228,7 @@ func (g *Game) Reset() {
 
 // TogglePause toggles the game's paused state
 func (g *Game) TogglePause() {
-	// 暂停/继续游戏的逻辑
-	// 这里可以添加暂停功能的实现
+	g.pause = !g.pause
 }
 
 // Run starts the game loop
@@ -286,7 +289,7 @@ func (g *Game) Run() {
 			g.collided = false
 			continue
 		}
-		if g.started {
+		if g.started && !g.pause {
 			// 只有在分数不闪烁时才增加分数
 			if !g.scoreBlinking {
 				// 使用帧计数器来减慢积分累计速度

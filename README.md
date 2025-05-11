@@ -8,6 +8,26 @@ A terminal-based dinosaur runner game inspired by the Chrome offline game, imple
 
 ![Term-Rex Game Demo](./assets/demo.gif)
 
+```
+Score: 356  (Q to quit)                                               High: 6062
+                                         .--.                                   
+                                     .-(    )-.                      .--.       
+        .--.                         (________)                  .-(    )-.     
+    .-(    )-.                                                   (________)         
+    (________)                                                                       
+                                                                                       
+              /                    GAME OVER                                         
+             <O=-                                                                   
+           +++\           ('R' to retry, 'Q' to quit)                             
+     +    ++Q++
+     + +++++  +                                              |                       
+      ++++++                                             \|/\|/                       
+       /   /                                              |  |                       
+________________________________________________________________________________
+   .    -    ,     `   ,     ,  `     ' `     -  .     .   -     - - '  .    `  
+
+```
+
 ## Installation
 
 ### macOS / Linux
@@ -25,12 +45,6 @@ scoop bucket add jianongHe https://github.com/jianongHe/scoop-bucket.git
 scoop install term-rex
 ```
 
-### Npm
-
-```bash
-npm install -g term-rex
-```
-
 ### Direct Download
 
 Download the pre-built binary for your system from the [releases page](https://github.com/jianongHe/term-rex/releases/latest).
@@ -39,14 +53,14 @@ Or you can directly clone this repo and `go run main.go`
 
 ## Game Controls
 
-| Key | Action |
-|-----|--------|
+| Key                             | Action |
+|---------------------------------|--------|
 | <kbd>Space</kbd> / <kbd>↑</kbd> | Jump |
-| <kbd>↓</kbd> | Duck |
-| <kbd>p</kbd> | Pause/Resume |
-| <kbd>m</kbd> | Toggle sound |
-| <kbd>r</kbd> | Restart (after game over) |
-| <kbd>q</kbd> / <kbd>Esc</kbd> | Quit |
+| <kbd>↓</kbd>                    | Duck |
+| <kbd>P</kbd>                    | Pause/Resume |
+| <kbd>M</kbd>                    | Toggle sound |
+| <kbd>R</kbd>                    | Restart (after game over) |
+| <kbd>Q</kbd> / <kbd>Esc</kbd>   | Quit |
 
 ## Uninstallation
 

@@ -394,9 +394,9 @@ const (
 
 // Character key bindings
 const (
-	KeyQuitRune = 'q' // alternate quit
-	// restart game
-	KeyRestartRune = 'r'
+	KeyQuitRune    = 'q' // alternate quit
+	KeyRestartRune = 'r' // restart game
+	KeyPauseRune   = 'p' // pause/resume game
 )
 
 // 障碍物组合配置

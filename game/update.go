@@ -14,8 +14,15 @@ func (g *Game) update() {
 		g.dino.isDownKeyPressed = true
 	}
 
+	// Always update clouds regardless of game state or pause state
+	g.cloudManager.Update()
+
+	// If game is paused, don't update other game elements
+	if g.pause && g.started && !g.collided {
+		return
+	}
+
 	g.dino.Update()
-	g.cloudManager.Update() // Update clouds regardless of game state
 
 	if g.started {
 		g.applyStage()
