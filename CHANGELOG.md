@@ -2,6 +2,18 @@
 
 All notable changes to Term-Rex will be documented in this file.
 
+## [0.1.4] - 2025-05-11
+
+### Added
+- Added big bird obstacle for increased gameplay variety
+- Implemented cloud system with different speeds and positions
+- Added ground decorations for improved visual appeal
+
+### Changed
+- Refactored obstacle system using object-oriented design
+- Improved game scene with layered visual elements
+- Optimized collision detection for different obstacle types
+
 ## [0.1.3] - 2025-05-11
 
 ### Added
