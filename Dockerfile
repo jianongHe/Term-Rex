@@ -1,22 +1,47 @@
+# Build stage
+FROM golang:1.22-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git
+
+# Set working directory
+WORKDIR /src
+
+# Copy go.mod and go.sum files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy the source code
+COPY . .
+
+# Build the application with proper version information
+ARG VERSION=0.1.7
+ARG BUILD_DATE=$(date -u +"%Y-%m-%d")
+RUN CGO_ENABLED=0 go build -ldflags="-s -w -X main.Version=${VERSION} -X main.BuildDate=${BUILD_DATE}" -o term-rex
+
+# Runtime stage
 FROM alpine:latest
 
-# 安装运行时可能需要的基本依赖
-RUN apk add --no-cache ca-certificates alsa-lib
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates ncurses-terminfo
 
-# 设置工作目录
+# Set working directory
 WORKDIR /app
 
-# 复制预编译的二进制文件到容器中
-COPY ./bin/term-rex /app/term-rex
+# Copy the binary from builder stage
+COPY --from=builder /src/term-rex /app/term-rex
 
-# 复制资源文件
-COPY ./assets /app/assets/
-
-# 设置环境变量
+# Set terminal environment
 ENV TERM=xterm-256color
 
-# 设置可执行权限
+# Set executable permissions
 RUN chmod +x /app/term-rex
 
-# 运行应用
-CMD ["/app/term-rex"]
+# Create a non-root user to run the application
+RUN addgroup -S termrex && adduser -S termrex -G termrex
+USER termrex
+
+# Command to run
+ENTRYPOINT ["/app/term-rex"]

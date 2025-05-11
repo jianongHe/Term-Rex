@@ -88,6 +88,33 @@ scoop bucket rm jianongHe  # Optional: remove the bucket
 
 Contributions are welcome! Feel free to submit issues or pull requests.
 
+## Docker
+
+You can also run Term-Rex in a Docker container:
+
+```bash
+# Pull the image
+docker pull jianonghe/term-rex:latest
+
+# Run the game
+docker run -it --rm jianonghe/term-rex
+```
+
+Or build and run locally:
+
+```bash
+# Build the image
+docker build -t term-rex .
+
+# Run the container
+docker run -it --rm term-rex
+```
+
+Using docker-compose:
+
+```bash
+docker-compose up
+```
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

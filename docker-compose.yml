@@ -2,6 +2,15 @@ version: '3'
 
 services:
   term-rex:
-    image: term-rex:latest
-    tty: true
-    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: 0.1.7
+        BUILD_DATE: ${BUILD_DATE:-2025-05-11}
+    image: jianonghe/term-rex:latest
+    container_name: term-rex
+    environment:
+      - TERM=xterm-256color
+    stdin_open: true  # docker run -i
+    tty: true         # docker run -t
