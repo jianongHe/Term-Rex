@@ -2,6 +2,18 @@
 
 All notable changes to Term-Rex will be documented in this file.
 
+## [0.1.3] - 2025-05-11
+
+### Added
+- Added pause functionality with 'P' key
+- Improved pause UI with clear visual indicators
+- Updated README to reflect pause feature
+
+### Changed
+- Optimized game loop to handle pause state properly
+- Clouds continue to move during pause for visual effect
+- Refactored input handling for better code organization
+
 ## [0.1.2] - 2025-05-11
 
 ### Added
