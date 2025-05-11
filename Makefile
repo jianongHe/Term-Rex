@@ -1,6 +1,6 @@
 .PHONY: build clean test release snapshot
 
-VERSION := 0.1.0
+VERSION := 0.1.1
 BUILD_DATE := $(shell date +%Y-%m-%d)
 LDFLAGS := -ldflags "-X main.Version=$(VERSION) -X main.BuildDate=$(BUILD_DATE)"
 

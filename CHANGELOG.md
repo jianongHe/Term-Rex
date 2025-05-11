@@ -2,6 +2,13 @@
 
 All notable changes to Term-Rex will be documented in this file.
 
+## [0.1.1] - 2025-05-11
+
+### Changed
+- Moved dinosaur position 2 cells to the right for better gameplay experience
+- Slowed down score accumulation rate for a more gradual difficulty curve
+- Optimized README documentation for clearer installation and usage instructions
+
 ## [0.1.0] - 2025-05-11
 
 ### Added
