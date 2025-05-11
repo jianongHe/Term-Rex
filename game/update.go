@@ -113,14 +113,15 @@ func (g *Game) gameOver() {
 		}
 	}
 
-	PrintCenter("GAME OVER (r to retry, q to quit)")
+	PrintCenter("GAME OVER")
+	PrintCenterAt("('R' to retry, 'Q' to quit)", height/2+2)
 
 	// 显示音效控制提示
-	soundMsg := "Press 'm' to toggle sound"
-	if !GetAudioManager().IsEnabled() {
-		soundMsg = "Sound OFF - Press 'm' to enable"
-	}
-	PrintCenterAt(soundMsg, height/2+2)
+	//soundMsg := "Press 'm' to toggle sound"
+	//if !GetAudioManager().IsEnabled() {
+	//	soundMsg = "Sound OFF - Press 'm' to enable"
+	//}
+	//PrintCenterAt(soundMsg, height/2+2)
 
 	termbox.Flush()
 	for {

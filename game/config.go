@@ -78,7 +78,7 @@ var dinoStandFrames = []Sprite{
 	},
 	{
 		"       ++++ ",
-		" +    ++@++ ",
+		" +    ++Q++ ",
 		" + +++++  + ",
 		"  ++++++    ",
 		"   /   /    ",
@@ -88,7 +88,7 @@ var dinoStandFrames = []Sprite{
 // Animation frames for ducking Dino
 var dinoDuckFrames = []Sprite{
 	{
-		"       +++  ",
+		"       ++++ ",
 		" -    ++@++ ",
 		"  ++++++    ",
 		"   :   :    ",

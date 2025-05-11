@@ -109,11 +109,11 @@ func (g *Game) drawStartScreen() {
 	PrintCenter("Press Space or Up Arrow to Start")
 
 	// 显示音效控制提示
-	soundMsg := "Press 'm' to toggle sound"
-	if !GetAudioManager().IsEnabled() {
-		soundMsg = "Sound OFF - Press 'm' to enable"
-	}
-	PrintCenterAt(soundMsg, height/2+2)
+	//soundMsg := "Press 'm' to toggle sound"
+	//if !GetAudioManager().IsEnabled() {
+	//	soundMsg = "Sound OFF - Press 'm' to enable"
+	//}
+	//PrintCenterAt(soundMsg, height/2+2)
 }
 
 // drawGameScene renders the full game scene after start
@@ -161,9 +161,9 @@ func (g *Game) draw() {
 		// 闪烁状态下，用空格替换分数的每一位，保持原有位数
 		scoreStr := fmt.Sprintf("%d", g.score)
 		blankScore := strings.Repeat(" ", len(scoreStr))
-		PrintAt(0, 0, fmt.Sprintf("Score: %s  (q to quit)", blankScore))
+		PrintAt(0, 0, fmt.Sprintf("Score: %s  (Q to quit)", blankScore))
 	} else {
-		PrintAt(0, 0, fmt.Sprintf("Score: %d  (q to quit)", g.score))
+		PrintAt(0, 0, fmt.Sprintf("Score: %d  (Q to quit)", g.score))
 	}
 
 	// 显示音效状态
