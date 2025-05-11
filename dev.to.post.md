@@ -126,15 +126,15 @@ Amazon Q helped me make Term-Rex available everywhere:
 
 ## Conclusion
 
-During my brief two-day development experience with this project, I discovered that I've genuinely come to enjoy using Amazon Q. Initially, I thought it was just another LLM client similar to ChatGPT or Gemini, but after getting hands-on experience, I realized it can do so much more.
+During this short development experience within 2 days in this project, I discovered that I've genuinely come to enjoy using Amazon Q. Initially, I thought it was just another LLM client similar to ChatGPT or Gemini, but after getting hands-on experience, I realized it can do so much more.
 
 With well-crafted prompts, it can fully function as a "senior developer" to assist your development process. It automatically creates necessary files, implements clean and readable object-oriented code, and even runs `go vet` to validate code correctness. If there are any issues, it continuously works to fix them:
 
 ![img.png](assets/screenshot-fix-error.png)
 
-I believe it significantly enhances development efficiency and reliability, especially when working with strongly-typed languages.
+I believe it significantly enhances development efficiency and reliability, especially when working with strongly-typed languages like `golang`.
 
-Of course, it does have drawbacks, including one major limitation - the dreaded `reached max token` error, haha:
+Of course, it does have drawbacks, So far I think its biggest flaw is - the dreaded `reached max tokens` error, haha:
 
 ![img.png](assets/screenshot-reached-limit.png)
 
