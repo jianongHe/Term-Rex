@@ -77,8 +77,8 @@ https://github.com/jianongHe/Term-Rex
 
 ## How I Used Amazon Q Developer
 
-Did you notice the dino’s eye is a ‘Q’? Guess what? That’s Amazon Q’s, haha.
-To be honest, 90% of this game’s code was done by Amazon Q. I just described everything I wanted in the terminal, and it basically did the rest.
+Did you notice the dino's eye is a 'Q'? Guess what? That's Amazon Q's, haha.
+To be honest, 90% of this game's code was done by Amazon Q. I just described everything I wanted in the terminal, and it basically did the rest.
 
 What impressed me most about working with Amazon Q Developer was:
 
@@ -127,21 +127,18 @@ Amazon Q helped me make Term-Rex available everywhere:
 
 ## Conclusion
 
+During my brief two-day development experience with this project, I discovered that I've genuinely come to enjoy using Amazon Q. Initially, I thought it was just another LLM client similar to ChatGPT or Gemini, but after getting hands-on experience, I realized it can do so much more.
 
-在我2天内开发这个项目期间短暂的接触下来，我发现我真的开始喜欢上使用Amazon Q了，
-因为原本我以为它是类似ChatGPT或者Gemini之类的LLM客户端，但是我上手后才发现它可以做更多的事情，
-只要prompts写的恰当，它完全可以作为一位“资深开发者”的身份来帮助你开发，
-比如自动帮你创建必要文件，自动以结构清晰可读高的方式进行OOP编码，然后再编码完成后它甚至还会自动帮你执行`go vet`来验证代码合法性，
-如果有不对的地方它会持续改正:
+With well-crafted prompts, it can fully function as a "senior developer" to assist your development process. It automatically creates necessary files, implements clean and readable object-oriented code, and even runs `go vet` to validate code correctness. If there are any issues, it continuously works to fix them:
 
 ![img.png](assets/screenshot-fix-error.png)
 
-我觉得它配合强类型语言能很大提升开发项目的效率和可靠性。
+I believe it significantly enhances development efficiency and reliability, especially when working with strongly-typed languages.
 
-当然，它也是有缺点的，而且还是很致命的缺点，我觉得目前最大的缺点就是`reached max token` 哈哈：
+Of course, it does have drawbacks, including one major limitation - the dreaded `reached max token` error, haha:
 
 ![img.png](assets/screenshot-reached-limit.png)
 
 ---
 
-谢谢阅读，请随意试玩这个经典的小游戏，注意：不用离线也能玩
+Thanks for reading! Feel free to try this classic mini-game. Note: You don't need to be offline to play it!
