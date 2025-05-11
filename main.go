@@ -28,16 +28,21 @@ func main() {
 
 	// Initialize terminal
 	if err := termbox.Init(); err != nil {
-		panic(err)
+		fmt.Printf("Failed to initialize terminal: %v\n", err)
+		os.Exit(1)
 	}
 	defer termbox.Close()
 
-	// Dynamic width based on terminal size
-	//w, _ := termbox.Size()
-	//game.SetWidth(w)
+	// Get terminal size
+	w, _ := termbox.Size()
 
-	// Start game
+	// Set game width based on terminal size
+	game.SetWidth(w)
+
+	// Create a new game instance
 	g := game.NewGame()
+
+	// Run the game
 	g.Run()
 }
 
