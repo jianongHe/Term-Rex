@@ -36,6 +36,13 @@ ________________________________________________________________________________
 brew install jianongHe/tap/term-rex
 ```
 
+### Npm
+
+```bash
+# Install with Npm
+npm -g term-rex
+```
+
 ### Windows
 
 ```powershell
