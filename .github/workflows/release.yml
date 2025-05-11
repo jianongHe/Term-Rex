@@ -75,7 +75,9 @@ jobs:
       - name: Update package.json version
         run: |
           VERSION=${{ needs.update-version.outputs.version }}
-          npm version $VERSION --no-git-tag-version
+          # Use jq to update version without npm version command
+          jq ".version = \"$VERSION\"" package.json > package.json.tmp
+          mv package.json.tmp package.json
           
       - name: Install dependencies
         run: npm ci || npm install
