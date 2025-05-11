@@ -1,9 +1,9 @@
 package game
 
 import (
-	"os"
-
 	"github.com/nsf/termbox-go"
+	"math/rand"
+	"os"
 	"time"
 )
 
@@ -47,6 +47,50 @@ func (g *Game) updateGroundDecorations() {
 			// 如果装饰移出了屏幕左侧，将其移到屏幕右侧重新出现
 			if groundDecorations[i].x < -5 {
 				groundDecorations[i].x += float64(width * 2)
+			}
+		}
+
+		// 同样移动地面线字符
+		for i := range groundLineChars {
+			groundLineChars[i].x -= obstacleSpeed
+
+			// 如果地面线字符移出了屏幕左侧，将其移到屏幕右侧重新出现
+			if groundLineChars[i].x < -5 {
+				groundLineChars[i].x += float64(width * 2)
+
+				// 默认重置为下划线
+				groundLineChars[i].char = '_'
+			}
+		}
+
+		// 每隔一段时间添加一个新的特殊字符
+		// 使用静态计数器来控制添加频率
+		g.groundSpecialCharCounter += 1
+
+		// 每移动约200-300个单位添加一个特殊字符
+		if g.groundSpecialCharCounter >= 200+rand.Intn(100) {
+			g.groundSpecialCharCounter = 0
+
+			// 在屏幕右侧边缘添加一个特殊字符
+			for i := range groundLineChars {
+				// 找到一个位于屏幕右侧的字符
+				if int(groundLineChars[i].x) >= width-5 && int(groundLineChars[i].x) <= width {
+					// 选择一个特殊字符
+					var specialChar rune
+					switch rand.Intn(4) {
+					case 0:
+						specialChar = '='
+					case 1:
+						specialChar = '~'
+					case 2:
+						specialChar = '-'
+					case 3:
+						specialChar = '^'
+					}
+
+					groundLineChars[i].char = specialChar
+					break // 只修改一个字符
+				}
 			}
 		}
 	}

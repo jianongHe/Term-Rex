@@ -16,26 +16,27 @@ func SetWidth(w int) {
 
 // Game holds all state
 type Game struct {
-	dino                 *Dino
-	obstacleManager      *ObstacleManager
-	downKeyHeld          bool // 添加一个字段来跟踪下键状态
-	cloudManager         *CloudManager
-	ticker               *time.Ticker
-	events               chan termbox.Event
-	score                int
-	highestScore         int
-	groundStart          int
-	groundEnd            int
-	started              bool
-	groundExtending      bool
-	collided             bool // indicates collision occurred
-	stageIndexActive     int
-	stageIndexTarget     int
-	stageTransitionStart time.Time
-	scoreBlinking        bool      // 标记分数是否正在闪烁
-	scoreBlinkStart      time.Time // 分数开始闪烁的时间
-	scoreBlinkVisible    bool      // 控制分数闪烁的显示/隐藏状态
-	lastBlinkToggle      time.Time // 上次闪烁状态切换的时间
+	dino                     *Dino
+	obstacleManager          *ObstacleManager
+	downKeyHeld              bool // 添加一个字段来跟踪下键状态
+	cloudManager             *CloudManager
+	ticker                   *time.Ticker
+	events                   chan termbox.Event
+	score                    int
+	highestScore             int
+	groundStart              int
+	groundEnd                int
+	started                  bool
+	groundExtending          bool
+	collided                 bool // indicates collision occurred
+	stageIndexActive         int
+	stageIndexTarget         int
+	stageTransitionStart     time.Time
+	scoreBlinking            bool      // 标记分数是否正在闪烁
+	scoreBlinkStart          time.Time // 分数开始闪烁的时间
+	scoreBlinkVisible        bool      // 控制分数闪烁的显示/隐藏状态
+	lastBlinkToggle          time.Time // 上次闪烁状态切换的时间
+	groundSpecialCharCounter int       // 用于控制特殊地面字符的添加频率
 }
 
 // NewGame initializes and returns a new Game
@@ -71,25 +72,26 @@ func NewGame() *Game {
 	}
 
 	return &Game{
-		dino:                 d,
-		obstacleManager:      NewObstacleManager(),
-		cloudManager:         NewCloudManager(),
-		ticker:               time.NewTicker(tickDuration),
-		events:               events,
-		score:                3000,
-		highestScore:         highScore,
-		groundStart:          gs,
-		groundEnd:            ge,
-		started:              false,
-		groundExtending:      false,
-		downKeyHeld:          false,
-		stageIndexActive:     0,
-		stageIndexTarget:     0,
-		stageTransitionStart: time.Time{},
-		scoreBlinking:        false,
-		scoreBlinkStart:      time.Time{},
-		scoreBlinkVisible:    true,
-		lastBlinkToggle:      time.Time{},
+		dino:                     d,
+		obstacleManager:          NewObstacleManager(),
+		cloudManager:             NewCloudManager(),
+		ticker:                   time.NewTicker(tickDuration),
+		events:                   events,
+		score:                    3000,
+		highestScore:             highScore,
+		groundStart:              gs,
+		groundEnd:                ge,
+		started:                  false,
+		groundExtending:          false,
+		downKeyHeld:              false,
+		stageIndexActive:         0,
+		stageIndexTarget:         0,
+		stageTransitionStart:     time.Time{},
+		scoreBlinking:            false,
+		scoreBlinkStart:          time.Time{},
+		scoreBlinkVisible:        true,
+		lastBlinkToggle:          time.Time{},
+		groundSpecialCharCounter: 0,
 	}
 }
 
