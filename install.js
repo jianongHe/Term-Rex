@@ -3,8 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// Current version - must match package.json
-const version = '0.1.3';
+const version= '0.1.4';
 
 // Determine platform and architecture
 const platform = os.platform();

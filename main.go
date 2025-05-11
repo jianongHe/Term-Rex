@@ -10,9 +10,9 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
-// Version information
+// Version information - this should match version.js
 const (
-	Version   = "0.1.3"
+	Version   = "0.1.4"
 	BuildDate = "2025-05-11"
 )
 
