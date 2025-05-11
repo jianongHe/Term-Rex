@@ -34,6 +34,8 @@ ________________________________________________________________________________
 ```bash
 # Install with Homebrew
 brew install jianongHe/tap/term-rex
+# Start Play
+term-rex
 ```
 
 ### Npm
@@ -41,6 +43,8 @@ brew install jianongHe/tap/term-rex
 ```bash
 # Install with Npm
 npm -g term-rex
+# Start Play
+term-rex
 ```
 
 ### Windows
