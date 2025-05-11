@@ -2,6 +2,21 @@
 
 All notable changes to Term-Rex will be documented in this file.
 
+## [0.1.8] - 2025-05-11
+
+### Added
+- Enhanced cloud system with improved distribution and movement patterns
+- Optimized obstacle generation algorithm for better gameplay balance
+
+### Changed
+- Refined big bird obstacle behavior for more challenging gameplay
+- Improved visual consistency across different terminal sizes
+- Removed debug logs for cleaner production code
+
+### Fixed
+- Fixed potential race condition in obstacle management
+- Improved performance on systems with limited resources
+
 ## [0.1.7] - 2025-05-11
 
 ### Changed
