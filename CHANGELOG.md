@@ -2,6 +2,13 @@
 
 All notable changes to Term-Rex will be documented in this file.
 
+## [0.1.6] - 2025-05-11
+
+### Fixed
+- Fixed installation script to use correct version number
+- Updated package.json version to match application version
+- Synchronized version numbers across all project files
+
 ## [0.1.5] - 2025-05-11
 
 ### Fixed

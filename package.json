@@ -1,6 +1,6 @@
 {
   "name": "term-rex",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "Terminal-based dinosaur runner game",
   "bin": {
     "term-rex": "./bin/term-rex"
