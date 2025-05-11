@@ -33,11 +33,9 @@ func main() {
 	}
 	defer termbox.Close()
 
-	// Get terminal size
-	w, _ := termbox.Size()
-
 	// Set game width based on terminal size
-	game.SetWidth(w)
+	//w, _ := termbox.Size()
+	//game.SetWidth(w)
 
 	// Create a new game instance
 	g := game.NewGame()

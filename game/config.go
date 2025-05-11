@@ -10,6 +10,9 @@ import (
 // 默认屏幕宽度（会被 SetWidth 覆盖）
 var width = 80
 
+// 最大有效游戏宽度（超过这个宽度，障碍物不会从更远处生成）
+const maxEffectiveWidth = 120
+
 // 固定游戏高度（行数）
 const height = 15
 
@@ -235,15 +238,15 @@ type StageConfig struct {
 
 // stageConfigs lists the stages in ascending order of score threshold.
 var stageConfigs = []StageConfig{
-	{ScoreThreshold: 0, Speed: 1.2, BirdProb: 0.05, BigBirdProb: 0.01, GroupCactusProb: 0.10, MinGap: 50, MaxGap: 80},
-	{ScoreThreshold: 100, Speed: 1.4, BirdProb: 0.10, BigBirdProb: 0.03, GroupCactusProb: 0.15, MinGap: 50, MaxGap: 70},
-	{ScoreThreshold: 300, Speed: 1.6, BirdProb: 0.15, BigBirdProb: 0.05, GroupCactusProb: 0.20, MinGap: 40, MaxGap: 65},
-	{ScoreThreshold: 600, Speed: 1.8, BirdProb: 0.20, BigBirdProb: 0.08, GroupCactusProb: 0.25, MinGap: 40, MaxGap: 60},
-	{ScoreThreshold: 1000, Speed: 2.0, BirdProb: 0.25, BigBirdProb: 0.10, GroupCactusProb: 0.30, MinGap: 30, MaxGap: 58},
-	{ScoreThreshold: 1500, Speed: 2.3, BirdProb: 0.30, BigBirdProb: 0.15, GroupCactusProb: 0.30, MinGap: 30, MaxGap: 55},
-	{ScoreThreshold: 2000, Speed: 2.6, BirdProb: 0.40, BigBirdProb: 0.18, GroupCactusProb: 0.35, MinGap: 25, MaxGap: 50},
-	{ScoreThreshold: 2500, Speed: 2.8, BirdProb: 0.45, BigBirdProb: 0.20, GroupCactusProb: 0.35, MinGap: 25, MaxGap: 45},
-	{ScoreThreshold: 3000, Speed: 3.0, BirdProb: 0.50, BigBirdProb: 0.25, GroupCactusProb: 0.40, MinGap: 20, MaxGap: 40},
+	{ScoreThreshold: 0, Speed: 1.2, BirdProb: 0.05, BigBirdProb: 0.01, GroupCactusProb: 0.10, MinGap: 60, MaxGap: 90},
+	{ScoreThreshold: 100, Speed: 1.4, BirdProb: 0.10, BigBirdProb: 0.03, GroupCactusProb: 0.15, MinGap: 55, MaxGap: 85},
+	{ScoreThreshold: 300, Speed: 1.6, BirdProb: 0.15, BigBirdProb: 0.05, GroupCactusProb: 0.20, MinGap: 50, MaxGap: 80},
+	{ScoreThreshold: 600, Speed: 1.8, BirdProb: 0.20, BigBirdProb: 0.08, GroupCactusProb: 0.25, MinGap: 45, MaxGap: 75},
+	{ScoreThreshold: 1000, Speed: 2.0, BirdProb: 0.25, BigBirdProb: 0.10, GroupCactusProb: 0.30, MinGap: 40, MaxGap: 70},
+	{ScoreThreshold: 1500, Speed: 2.3, BirdProb: 0.30, BigBirdProb: 0.15, GroupCactusProb: 0.30, MinGap: 35, MaxGap: 65},
+	{ScoreThreshold: 2000, Speed: 2.6, BirdProb: 0.40, BigBirdProb: 0.18, GroupCactusProb: 0.35, MinGap: 30, MaxGap: 60},
+	{ScoreThreshold: 2500, Speed: 2.8, BirdProb: 0.45, BigBirdProb: 0.20, GroupCactusProb: 0.35, MinGap: 28, MaxGap: 55},
+	{ScoreThreshold: 3000, Speed: 3.0, BirdProb: 0.50, BigBirdProb: 0.25, GroupCactusProb: 0.40, MinGap: 25, MaxGap: 50},
 }
 
 // duration of smooth transition between stages

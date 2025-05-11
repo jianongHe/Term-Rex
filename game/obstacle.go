@@ -74,7 +74,9 @@ func NewCactus() *Cactus {
 
 // Reset resets the cactus position and animation
 func (c *Cactus) Reset() {
-	c.posX = float64(width - 1)
+	// 使用有效宽度而不是实际宽度
+	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+	c.posX = effectiveWidth
 	c.y = height - 2
 	c.animFrame = 0
 	c.animCounter = 0
@@ -113,7 +115,9 @@ func NewBird() *Bird {
 
 // Reset resets the bird position and animation
 func (b *Bird) Reset() {
-	b.posX = float64(width - 1)
+	// 使用有效宽度而不是实际宽度
+	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+	b.posX = effectiveWidth
 	b.y = birdFlightRow
 	b.animFrame = 0
 	b.animCounter = 0
@@ -152,7 +156,9 @@ func NewBigBird() *BigBird {
 
 // Reset resets the big bird position and animation
 func (b *BigBird) Reset() {
-	b.posX = float64(width - 1)
+	// 使用有效宽度而不是实际宽度
+	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+	b.posX = effectiveWidth
 	b.y = bigBirdFlightRow
 	b.animFrame = 0
 	b.animCounter = 0
@@ -225,6 +231,29 @@ func (om *ObstacleManager) Update() {
 	} else if len(om.obstacles) == 0 {
 		// 如果没有障碍物，立即生成一个
 		om.generateNewObstacle()
+	} else {
+		// 检查最右边的障碍物是否已经进入屏幕足够距离
+		rightmostX := float64(-100) // 初始值设为屏幕外
+		for _, obs := range om.obstacles {
+			x, _ := obs.GetPosition()
+			if x > rightmostX {
+				rightmostX = x
+			}
+		}
+
+		// 如果最右边的障碍物已经进入屏幕一定距离，可以考虑生成新障碍物
+		// 这个距离是基于有效屏幕宽度动态计算的
+		effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+		entryThreshold := effectiveWidth * 0.7 // 有效宽度的70%
+		if rightmostX < entryThreshold {
+			// 有一定概率立即生成新障碍物，而不等待计时器
+			// 概率随着屏幕宽度增加而增加，但基于有效宽度
+			effectiveWidthFactor := effectiveWidth / 80.0
+			spawnChance := 0.1 * math.Min(effectiveWidthFactor, 3.0) // 最高30%概率
+			if rand.Float64() < spawnChance {
+				om.generateNewObstacle()
+			}
+		}
 	}
 }
 
@@ -251,21 +280,7 @@ func (om *ObstacleManager) GetObstacles() []IObstacle {
 func (om *ObstacleManager) generateNewObstacle() {
 	var newObstacle IObstacle
 
-	// 根据当前游戏阶段动态调整障碍物生成逻辑
-	maxObstaclesOnScreen := 3
-	if om.currentStage <= 1 { // 初始阶段（0-100分）
-		maxObstaclesOnScreen = 1 // 前期最多只有1个障碍物在屏幕上
-	} else if om.currentStage <= 3 { // 中期阶段（100-600分）
-		maxObstaclesOnScreen = 2 // 中期最多有2个障碍物
-	}
-
-	// 检查屏幕上已有的障碍物数量，如果超过阈值，延迟生成新障碍物
-	if len(om.obstacles) >= maxObstaclesOnScreen {
-		// 增加间隔时间，确保障碍物不会过于密集
-		om.nextGapTimer = om.maxGap
-		return
-	}
-
+	// Select obstacle type based on probabilities
 	r := rand.Float64()
 	if r < bigBirdProbability {
 		newObstacle = NewBigBird()
@@ -277,33 +292,43 @@ func (om *ObstacleManager) generateNewObstacle() {
 		newObstacle = NewCactus()
 	}
 
-	// 添加到障碍物列表
+	// Add to obstacle list
 	om.obstacles = append(om.obstacles, newObstacle)
 
-	// 设置下一个障碍物的生成间隔
-	// 根据游戏阶段调整间隔生成策略
-	var gapMultiplier float64 = 1.0
-	if om.currentStage <= 1 {
-		// 初始阶段，使用更大的间隔
-		gapMultiplier = 1.5
-	} else if om.currentStage <= 3 {
-		// 中期阶段，使用稍大的间隔
-		gapMultiplier = 1.2
+	// Calculate gap for next obstacle
+	// The gap is measured in frames (how many update cycles before generating the next obstacle)
+
+	// Base gap multiplier - higher value means larger gaps between obstacles
+	// Increasing from 0.5 to 0.8 to make obstacles less frequent
+	var gapMultiplier float64 = 0.8
+
+	// Adjust gap based on screen width
+	// For wider screens, we need proportionally larger gaps
+	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+	effectiveWidthFactor := effectiveWidth / 80.0
+
+	// For wider screens, increase the gap proportionally
+	// This ensures consistent difficulty regardless of screen width
+	if effectiveWidthFactor > 1.0 {
+		// Linear scaling for wider screens (instead of reducing gaps)
+		gapMultiplier *= effectiveWidthFactor * 0.8
 	}
 
-	// 使用加权随机，更倾向于选择较大的间隔值
+	// Select a random gap value between min and max for current stage
 	gapRange := om.maxGap - om.minGap + 1
-	weightedGap := om.minGap + int(float64(gapRange)*rand.Float64()*rand.Float64())
+	baseGap := om.minGap + rand.Intn(gapRange)
 
-	// 应用阶段乘数
-	weightedGap = int(float64(weightedGap) * gapMultiplier)
+	// Apply the multiplier to get final gap
+	finalGap := int(float64(baseGap) * gapMultiplier)
 
-	// 确保不超过最大间隔
-	if weightedGap > int(float64(om.maxGap)*1.5) {
-		weightedGap = int(float64(om.maxGap) * 1.5)
+	// Ensure minimum reasonable gap
+	minAllowedGap := 10 // Increased from 3 to 10 for better spacing
+	if finalGap < minAllowedGap {
+		finalGap = minAllowedGap
 	}
 
-	om.nextGapTimer = weightedGap
+	// Set timer for next obstacle generation
+	om.nextGapTimer = finalGap
 }
 
 // GroupCactus represents a group of connected cacti obstacle
@@ -320,7 +345,9 @@ func NewGroupCactus() *GroupCactus {
 
 // Reset resets the group cactus position and animation
 func (c *GroupCactus) Reset() {
-	c.posX = float64(width - 1)
+	// 使用有效宽度而不是实际宽度
+	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+	c.posX = effectiveWidth
 	c.y = height - 2
 	c.animFrame = 0
 	c.animCounter = 0
