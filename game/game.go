@@ -37,6 +37,7 @@ type Game struct {
 	scoreBlinkVisible        bool      // 控制分数闪烁的显示/隐藏状态
 	lastBlinkToggle          time.Time // 上次闪烁状态切换的时间
 	groundSpecialCharCounter int       // 用于控制特殊地面字符的添加频率
+	frameCounter             int       // 用于控制积分累计速度的帧计数器
 }
 
 // NewGame initializes and returns a new Game
@@ -92,6 +93,7 @@ func NewGame() *Game {
 		scoreBlinkVisible:        true,
 		lastBlinkToggle:          time.Time{},
 		groundSpecialCharCounter: 0,
+		frameCounter:             0,
 	}
 }
 
@@ -217,6 +219,7 @@ func (g *Game) Reset() {
 	g.scoreBlinkStart = time.Time{}
 	g.scoreBlinkVisible = true
 	g.lastBlinkToggle = time.Time{}
+	g.frameCounter = 0
 }
 
 // TogglePause toggles the game's paused state
@@ -286,7 +289,11 @@ func (g *Game) Run() {
 		if g.started {
 			// 只有在分数不闪烁时才增加分数
 			if !g.scoreBlinking {
-				g.score++
+				// 使用帧计数器来减慢积分累计速度
+				if g.frameCounter%2 == 0 {
+					g.score++
+				}
+				g.frameCounter++
 
 				// 每得到100分播放一次得分音效
 				if g.score/ScoreMilestone > lastScoreMilestone {

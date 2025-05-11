@@ -272,7 +272,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    100,
-		Speed:             1.6,
+		Speed:             1.8,
 		CactusProb:        0.80, // 80% 仙人掌, 20% 鸟类
 		SingleCactusRatio: 0.55, // 仙人掌类别内: 55% 单个仙人掌
 		ShortCactusRatio:  0.25, // 仙人掌类别内: 25% 矮仙人掌
@@ -284,7 +284,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    300,
-		Speed:             1.8,
+		Speed:             2.2,
 		CactusProb:        0.75, // 75% 仙人掌, 25% 鸟类
 		SingleCactusRatio: 0.50, // 仙人掌类别内: 50% 单个仙人掌
 		ShortCactusRatio:  0.25, // 仙人掌类别内: 25% 矮仙人掌
@@ -295,7 +295,7 @@ var stageConfigs = []StageConfig{
 		MaxGap:            80,
 	},
 	{
-		ScoreThreshold:    600,
+		ScoreThreshold:    500,
 		Speed:             2.8,
 		CactusProb:        0.70, // 70% 仙人掌, 30% 鸟类
 		SingleCactusRatio: 0.45, // 仙人掌类别内: 45% 单个仙人掌
@@ -308,7 +308,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    1000,
-		Speed:             2.1,
+		Speed:             3,
 		CactusProb:        0.65, // 65% 仙人掌, 35% 鸟类
 		SingleCactusRatio: 0.40, // 仙人掌类别内: 40% 单个仙人掌
 		ShortCactusRatio:  0.20, // 仙人掌类别内: 20% 矮仙人掌
@@ -320,7 +320,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    1500,
-		Speed:             2.3,
+		Speed:             3,
 		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
 		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
 		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
@@ -332,7 +332,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    2000,
-		Speed:             2.6,
+		Speed:             3,
 		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
 		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
 		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
@@ -344,7 +344,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    2500,
-		Speed:             2.8,
+		Speed:             3.2,
 		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
 		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
 		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
@@ -356,7 +356,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    3000,
-		Speed:             3.0,
+		Speed:             3.3,
 		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
 		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
 		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
@@ -368,7 +368,7 @@ var stageConfigs = []StageConfig{
 	},
 	{
 		ScoreThreshold:    6000,
-		Speed:             3.3,
+		Speed:             3.5,
 		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
 		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
 		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
