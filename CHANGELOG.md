@@ -2,6 +2,12 @@
 
 All notable changes to Term-Rex will be documented in this file.
 
+## [0.1.7] - 2025-05-11
+
+### Changed
+- Removed unused Makefile as CI uses GoReleaser directly
+- Simplified project structure
+
 ## [0.1.6] - 2025-05-11
 
 ### Fixed
