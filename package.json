@@ -1,12 +1,16 @@
 {
   "name": "term-rex",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "description": "Terminal-based dinosaur runner game",
   "bin": {
     "term-rex": "./bin/term-rex"
   },
   "scripts": {
     "postinstall": "node install.js"
+  },
+  "dependencies": {
+    "extract-zip": "^2.0.1",
+    "tar": "^6.1.11"
   },
   "repository": {
     "type": "git",

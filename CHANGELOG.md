@@ -2,6 +2,12 @@
 
 All notable changes to Term-Rex will be documented in this file.
 
+## [0.1.2] - 2025-05-11
+
+### Added
+- Added npm package support for easier installation via npm
+- Updated installation scripts to match current version
+
 ## [0.1.1] - 2025-05-11
 
 ### Changed
