@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,26 +10,38 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
+// Version information
+const (
+	Version   = "1.0.0"
+	BuildDate = "2025-05-11"
+)
+
 func main() {
-	// 设置信号处理，捕获 Ctrl+C
+	// Check for version flag
+	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
+		fmt.Printf("Term-Rex v%s (built on %s)\n", Version, BuildDate)
+		os.Exit(0)
+	}
+
+	// Set up signal handler to catch Ctrl+C
 	setupSignalHandler()
 
-	// initialize terminal
+	// Initialize terminal
 	if err := termbox.Init(); err != nil {
 		panic(err)
 	}
 	defer termbox.Close()
 
-	// dynamic width based on terminal size
+	// Dynamic width based on terminal size
 	//w, _ := termbox.Size()
 	//game.SetWidth(w)
 
-	// start game
+	// Start game
 	g := game.NewGame()
 	g.Run()
 }
 
-// setupSignalHandler 设置信号处理器，捕获 Ctrl+C 信号
+// setupSignalHandler sets up a signal handler to catch Ctrl+C
 func setupSignalHandler() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

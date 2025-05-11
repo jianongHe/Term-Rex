@@ -1,0 +1,22 @@
+{
+  "name": "term-rex",
+  "version": "1.0.0",
+  "description": "Terminal-based dinosaur runner game",
+  "bin": {
+    "term-rex": "./bin/term-rex"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jianongHe/Term-Rex.git"
+  },
+  "keywords": ["game", "terminal", "dinosaur", "runner"],
+  "author": "Jianong He",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jianongHe/Term-Rex/issues"
+  },
+  "homepage": "https://github.com/jianongHe/Term-Rex#readme"
+}

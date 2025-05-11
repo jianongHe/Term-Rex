@@ -226,7 +226,11 @@ func (g *Game) TogglePause() {
 // Run starts the game loop
 func (g *Game) Run() {
 	// 初始化音频系统
-	GetAudioManager()
+	audioManager := GetAudioManager()
+	// 如果音频初始化失败，记录警告但继续游戏
+	if !audioManager.IsEnabled() {
+		fmt.Println("Warning: Audio system initialization failed. Game will run without sound.")
+	}
 
 	lastScoreMilestone := 0
 

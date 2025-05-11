@@ -57,38 +57,32 @@ func (am *AudioManager) Initialize() error {
 		return err
 	}
 
-	// 加载所有音效
-	err = am.loadSound(SoundJump, "assets/sounds/jump.mp3")
-	if err != nil {
-		return err
-	}
+	// 尝试加载音效，但不要因为加载失败而中断游戏
+	am.tryLoadSound(SoundJump, "assets/sounds/jump.mp3")
+	am.tryLoadSound(SoundCollision, "assets/sounds/collision.wav")
+	am.tryLoadSound(SoundScore, "assets/sounds/score.wav")
+	am.tryLoadSound(SoundDrop, "assets/sounds/drop.mp3")
 
-	err = am.loadSound(SoundCollision, "assets/sounds/collision.wav")
-	if err != nil {
-		return err
-	}
-
-	err = am.loadSound(SoundScore, "assets/sounds/score.wav")
-	if err != nil {
-		return err
-	}
-
-	// 加载快速下降音效 - 暂时复用跳跃音效
-	// 如果有专门的下降音效文件，可以替换为实际路径
-	err = am.loadSound(SoundDrop, "assets/sounds/jump.mp3")
-	if err != nil {
-		return err
+	// 如果没有成功加载任何音效，禁用音频系统
+	if len(am.soundBuffers) == 0 {
+		return nil
 	}
 
 	return nil
 }
 
-// loadSound 加载单个音效文件
-func (am *AudioManager) loadSound(name, path string) error {
+// tryLoadSound 尝试加载单个音效文件，如果失败则忽略错误
+func (am *AudioManager) tryLoadSound(name, path string) {
+	// 检查文件是否存在
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return
+	}
+
 	f, err := os.Open(path)
 	if err != nil {
-		return err
+		return
 	}
+	defer f.Close()
 
 	var streamer beep.StreamSeekCloser
 	var format beep.Format
@@ -101,20 +95,17 @@ func (am *AudioManager) loadSound(name, path string) error {
 	}
 
 	if err != nil {
-		f.Close()
-		return err
+		return
 	}
+	defer streamer.Close()
 
 	// 创建缓冲区以便重复播放
 	buffer := beep.NewBuffer(format)
 	buffer.Append(streamer)
-	streamer.Close()
 
 	am.mutex.Lock()
 	am.soundBuffers[name] = buffer
 	am.mutex.Unlock()
-
-	return nil
 }
 
 // PlaySound 播放指定的音效

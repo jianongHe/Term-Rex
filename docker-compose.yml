@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  term-rex:
+    image: term-rex:latest
+    tty: true
+    stdin_open: true

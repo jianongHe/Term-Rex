@@ -1,0 +1,25 @@
+name: term-rex
+version: '1.0.0'
+summary: Terminal-based dinosaur runner game
+description: |
+  A terminal-based dinosaur runner game inspired by the Chrome offline game,
+  implemented in Golang using the termbox-go library.
+
+base: core18
+confinement: strict
+grade: stable
+
+apps:
+  term-rex:
+    command: bin/term-rex
+    plugs:
+      - audio-playback
+      - home
+
+parts:
+  term-rex:
+    plugin: go
+    source: .
+    source-type: git
+    build-packages:
+      - gcc
