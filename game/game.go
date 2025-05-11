@@ -69,7 +69,7 @@ func NewGame() *Game {
 	highScore, err := LoadHighScore()
 	if err != nil {
 		// 如果加载失败，使用默认值0
-		fmt.Println("无法加载最高分:", err)
+		//fmt.Println("cant load highest score:", err)
 		highScore = 0
 	}
 
@@ -237,7 +237,7 @@ func (g *Game) Run() {
 	audioManager := GetAudioManager()
 	// 如果音频初始化失败，记录警告但继续游戏
 	if !audioManager.IsEnabled() {
-		fmt.Println("Warning: Audio system initialization failed. Game will run without sound.")
+		//fmt.Println("Warning: Audio system initialization failed. Game will run without sound.")
 	}
 
 	lastScoreMilestone := 0
