@@ -20,6 +20,10 @@ func (g *Game) update() {
 	if g.started {
 		g.applyStage()
 		g.obstacleManager.Update()
+
+		// 即使地面已经完全扩展，也要更新地面装饰的位置
+		g.updateGroundDecorations()
+
 		if g.checkCollision() {
 			g.collided = true
 		}
@@ -28,6 +32,21 @@ func (g *Game) update() {
 			// stop extending once ground fully spans screen
 			if g.groundStart == 0 && g.groundEnd == width-1 {
 				g.groundExtending = false
+			}
+		}
+	}
+}
+
+// updateGroundDecorations 更新地面装饰的位置，使其随着游戏进行而移动
+func (g *Game) updateGroundDecorations() {
+	if !g.collided {
+		// 移动所有地面装饰，速度与障碍物相同
+		for i := range groundDecorations {
+			groundDecorations[i].x -= obstacleSpeed
+
+			// 如果装饰移出了屏幕左侧，将其移到屏幕右侧重新出现
+			if groundDecorations[i].x < -5 {
+				groundDecorations[i].x += float64(width * 2)
 			}
 		}
 	}

@@ -7,7 +7,7 @@ import (
 
 // Ground decoration types
 type GroundDecoration struct {
-	x    int
+	x    float64 // 使用浮点数以支持平滑移动
 	char rune
 }
 
@@ -19,7 +19,7 @@ func InitGroundDecorations() {
 	groundDecorations = make([]GroundDecoration, 0)
 
 	// Add random decorations across the ground
-	for x := 0; x < width; x += 2 + rand.Intn(5) {
+	for x := 0; x < width*2; x += 2 + rand.Intn(5) { // 生成更多装饰，以便滚动时有足够的装饰
 		// Choose a decoration character
 		var char rune
 		switch rand.Intn(5) {
@@ -36,7 +36,7 @@ func InitGroundDecorations() {
 		}
 
 		groundDecorations = append(groundDecorations, GroundDecoration{
-			x:    x,
+			x:    float64(x),
 			char: char,
 		})
 	}
@@ -56,8 +56,9 @@ func DrawGround() {
 
 	// Draw decorations below the ground
 	for _, decoration := range groundDecorations {
-		if decoration.x < width {
-			termbox.SetCell(decoration.x, height, decoration.char, termbox.ColorWhite, termbox.ColorDefault)
+		intX := int(decoration.x) % (width * 2) // 使用取模运算使装饰在屏幕范围内循环
+		if intX < width {
+			termbox.SetCell(intX, height, decoration.char, termbox.ColorWhite, termbox.ColorDefault)
 		}
 	}
 }
@@ -71,8 +72,9 @@ func (g *Game) drawGroundPartial() {
 
 	// Draw decorations below the ground
 	for _, decoration := range groundDecorations {
-		if decoration.x >= g.groundStart && decoration.x <= g.groundEnd {
-			termbox.SetCell(decoration.x, height, decoration.char, termbox.ColorWhite, termbox.ColorDefault)
+		intX := int(decoration.x) % (width * 2) // 使用取模运算使装饰在屏幕范围内循环
+		if intX >= g.groundStart && intX <= g.groundEnd {
+			termbox.SetCell(intX, height, decoration.char, termbox.ColorWhite, termbox.ColorDefault)
 		}
 	}
 }
