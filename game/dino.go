@@ -18,7 +18,7 @@ type Dino struct {
 // NewDino creates a new Dino at the ground position
 func NewDino() *Dino {
 	return &Dino{
-		X:                2,
+		X:                4, // 将恐龙位置从2移动到4，向右移动2格
 		posY:             float64(height - 2),
 		isDownKeyPressed: false,
 		isFastDropping:   false,
