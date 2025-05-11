@@ -58,6 +58,7 @@ brews:
     repository:
       owner: jianongHe
       name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"  # Add this line
     commit_author:
       name: goreleaserbot
       email: goreleaser@github.com
@@ -74,6 +75,7 @@ scoops:
     repository:
       owner: jianongHe
       name: scoop-bucket
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"  # Add this line
     homepage: "https://github.com/jianongHe/term-rex"
     description: "A terminal-based dinosaur runner game inspired by Chrome's offline game"
     license: MIT
