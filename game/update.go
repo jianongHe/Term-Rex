@@ -74,9 +74,9 @@ func (g *Game) gameOver() {
 				g.stageIndexTarget = 0
 				g.stageTransitionStart = time.Time{}
 				obstacleSpeed = stageConfigs[0].Speed * speedFactor
-				birdProbability = stageConfigs[0].BirdProb
-				bigBirdProbability = stageConfigs[0].BigBirdProb
-				groupCactusProbability = stageConfigs[0].GroupCactusProb
+
+				// 重置障碍物管理器
+				g.obstacleManager = NewObstacleManager()
 				return
 			}
 			if ev.Key == KeyQuit || ev.Ch == KeyQuitRune {

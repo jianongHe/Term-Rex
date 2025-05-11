@@ -76,7 +76,7 @@ func NewGame() *Game {
 		cloudManager:         NewCloudManager(),
 		ticker:               time.NewTicker(tickDuration),
 		events:               events,
-		score:                0,
+		score:                3000,
 		highestScore:         highScore,
 		groundStart:          gs,
 		groundEnd:            ge,

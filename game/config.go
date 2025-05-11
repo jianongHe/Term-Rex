@@ -71,7 +71,7 @@ const (
 var dinoStandFrames = []Sprite{
 	{
 		"       ++++ ",
-		"++    ++@++ ",
+		"++    ++Q++ ",
 		" + +++++  + ",
 		"  ++++++    ",
 		"   |   |    ",
@@ -104,61 +104,78 @@ var dinoDuckFrames = []Sprite{
 // frames between animation switches (adjusted for new FPS)
 const animPeriod = fps / 12
 
-// Animation frames for single cactus obstacles
-var obstacleFrames = []Sprite{
-	{
-		" | ",
-		"/|\\",
-		" | ",
-	},
-	{
-		" | ",
-		"\\|/",
-		" | ",
-	},
-}
+// ObstacleType represents the type of obstacle
+type ObstacleType int
 
-// Animation frames for group cactus obstacles
-var groupCactusFrames = []Sprite{
-	{
-		"    |  ",
-		"/|\\/|\\",
-		" |  |",
-	},
-	{
-		"    |  ",
-		"\\|//|\\",
-		" |  |",
-	},
-}
+const (
+	SingleCactusType ObstacleType = iota
+	ShortCactusType
+	GroupCactusType
+	BirdType
+	BigBirdType
+)
 
-// Animation frames for flying birds
-var birdFrames = []Sprite{
-	{
-		" |   ",
-		"<o=- ",
-		" |   ",
+// ObstacleFrames stores all obstacle animation frames by type
+var ObstacleFrames = map[ObstacleType][]Sprite{
+	SingleCactusType: {
+		{
+			" | ",
+			"/|\\",
+			" | ",
+		},
+		{
+			" | ",
+			"\\|/",
+			" | ",
+		},
 	},
-	{
-		" /   ",
-		"<O=- ",
-		" \\   ",
+	ShortCactusType: {
+		{
+			"/:\\/:\\",
+			" | |",
+		},
+		{
+			"/|\\/|\\",
+			" | |",
+		},
 	},
-}
-
-// Animation frames for big birds
-var bigBirdFrames = []Sprite{
-	{
-		"  /\\    ",
-		" /  \\   ",
-		"<ooo=-- ",
-		" \\__/   ",
+	GroupCactusType: {
+		{
+			"    |  ",
+			"/|\\/|\\",
+			" |  |",
+		},
+		{
+			"    |  ",
+			"\\|/\\|/",
+			" |  |",
+		},
 	},
-	{
-		"  /\\    ",
-		" /  \\   ",
-		"<OOO=-- ",
-		" \\__/   ",
+	BirdType: {
+		{
+			" |   ",
+			"<o=- ",
+			" |   ",
+		},
+		{
+			" /   ",
+			"<O=- ",
+			" \\   ",
+		},
+	},
+	BigBirdType: {
+		{
+			"  /\\    ",
+			" /  \\   ",
+			"<ooo=-- ",
+			" \\__/   ",
+		},
+		{
+			"  /\\    ",
+			" /  \\   ",
+			"<OOO=-- ",
+			" \\__/   ",
+		},
 	},
 }
 
@@ -180,12 +197,6 @@ var cloudSprites = []Sprite{
 		"(________) ",
 	},
 }
-
-// bird appearance probability
-var birdProbability = 0.3
-
-// big bird appearance probability
-var bigBirdProbability = 0.15
 
 // bird flight height (row index) above bottom of screen
 const birdFlightRow = 9
@@ -227,26 +238,146 @@ const cloudBufferSpace = 5
 
 // StageConfig defines dynamic game parameters per stage based on score.
 type StageConfig struct {
-	ScoreThreshold  int     // minimum score to enter this stage
-	Speed           float64 // obstacleSpeed for this stage
-	BirdProb        float64 // birdProbability for this stage
-	BigBirdProb     float64 // bigBirdProbability for this stage
-	GroupCactusProb float64 // groupCactusProbability for this stage
-	MinGap          int     // 障碍物之间的最小间距（屏幕单位）
-	MaxGap          int     // 障碍物之间的最大间距（屏幕单位）
+	ScoreThreshold int     // minimum score to enter this stage
+	Speed          float64 // obstacleSpeed for this stage
+	CactusProb     float64 // 仙人掌类别的总概率 (0-1.0)
+	BirdProb       float64 // 鸟类别的总概率 (= 1.0 - CactusProb)
+
+	// 仙人掌类别内部的概率分布 (这些值加起来应该等于1.0)
+	SingleCactusRatio float64 // 单个仙人掌在仙人掌类别中的占比
+	ShortCactusRatio  float64 // 矮仙人掌在仙人掌类别中的占比
+	GroupCactusRatio  float64 // 组合仙人掌在仙人掌类别中的占比
+
+	// 鸟类别内部的概率分布 (这些值加起来应该等于1.0)
+	SmallBirdRatio float64 // 小鸟在鸟类别中的占比
+	BigBirdRatio   float64 // 大鸟在鸟类别中的占比
+
+	MinGap int // 障碍物之间的最小间距（屏幕单位）
+	MaxGap int // 障碍物之间的最大间距（屏幕单位）
 }
 
 // stageConfigs lists the stages in ascending order of score threshold.
 var stageConfigs = []StageConfig{
-	{ScoreThreshold: 0, Speed: 1.2, BirdProb: 0.05, BigBirdProb: 0.01, GroupCactusProb: 0.10, MinGap: 60, MaxGap: 90},
-	{ScoreThreshold: 100, Speed: 1.4, BirdProb: 0.10, BigBirdProb: 0.03, GroupCactusProb: 0.15, MinGap: 55, MaxGap: 85},
-	{ScoreThreshold: 300, Speed: 1.6, BirdProb: 0.15, BigBirdProb: 0.05, GroupCactusProb: 0.20, MinGap: 50, MaxGap: 80},
-	{ScoreThreshold: 600, Speed: 1.8, BirdProb: 0.20, BigBirdProb: 0.08, GroupCactusProb: 0.25, MinGap: 45, MaxGap: 75},
-	{ScoreThreshold: 1000, Speed: 2.0, BirdProb: 0.25, BigBirdProb: 0.10, GroupCactusProb: 0.30, MinGap: 40, MaxGap: 70},
-	{ScoreThreshold: 1500, Speed: 2.3, BirdProb: 0.30, BigBirdProb: 0.15, GroupCactusProb: 0.30, MinGap: 35, MaxGap: 65},
-	{ScoreThreshold: 2000, Speed: 2.6, BirdProb: 0.40, BigBirdProb: 0.18, GroupCactusProb: 0.35, MinGap: 30, MaxGap: 60},
-	{ScoreThreshold: 2500, Speed: 2.8, BirdProb: 0.45, BigBirdProb: 0.20, GroupCactusProb: 0.35, MinGap: 28, MaxGap: 55},
-	{ScoreThreshold: 3000, Speed: 3.0, BirdProb: 0.50, BigBirdProb: 0.25, GroupCactusProb: 0.40, MinGap: 25, MaxGap: 50},
+	{
+		ScoreThreshold:    0,
+		Speed:             1.4,
+		CactusProb:        0.90, // 90% 仙人掌, 10% 鸟类
+		SingleCactusRatio: 0.60, // 仙人掌类别内: 60% 单个仙人掌
+		ShortCactusRatio:  0.25, // 仙人掌类别内: 25% 矮仙人掌
+		GroupCactusRatio:  0.15, // 仙人掌类别内: 15% 组合仙人掌
+		SmallBirdRatio:    0.90, // 鸟类别内: 90% 小鸟
+		BigBirdRatio:      0.10, // 鸟类别内: 10% 大鸟
+		MinGap:            80,
+		MaxGap:            90,
+	},
+	{
+		ScoreThreshold:    100,
+		Speed:             1.6,
+		CactusProb:        0.80, // 80% 仙人掌, 20% 鸟类
+		SingleCactusRatio: 0.55, // 仙人掌类别内: 55% 单个仙人掌
+		ShortCactusRatio:  0.25, // 仙人掌类别内: 25% 矮仙人掌
+		GroupCactusRatio:  0.20, // 仙人掌类别内: 20% 组合仙人掌
+		SmallBirdRatio:    0.85, // 鸟类别内: 85% 小鸟
+		BigBirdRatio:      0.15, // 鸟类别内: 15% 大鸟
+		MinGap:            70,
+		MaxGap:            85,
+	},
+	{
+		ScoreThreshold:    300,
+		Speed:             1.8,
+		CactusProb:        0.75, // 75% 仙人掌, 25% 鸟类
+		SingleCactusRatio: 0.50, // 仙人掌类别内: 50% 单个仙人掌
+		ShortCactusRatio:  0.25, // 仙人掌类别内: 25% 矮仙人掌
+		GroupCactusRatio:  0.25, // 仙人掌类别内: 25% 组合仙人掌
+		SmallBirdRatio:    0.80, // 鸟类别内: 80% 小鸟
+		BigBirdRatio:      0.20, // 鸟类别内: 20% 大鸟
+		MinGap:            60,
+		MaxGap:            80,
+	},
+	{
+		ScoreThreshold:    600,
+		Speed:             2.8,
+		CactusProb:        0.70, // 70% 仙人掌, 30% 鸟类
+		SingleCactusRatio: 0.45, // 仙人掌类别内: 45% 单个仙人掌
+		ShortCactusRatio:  0.20, // 仙人掌类别内: 20% 矮仙人掌
+		GroupCactusRatio:  0.35, // 仙人掌类别内: 35% 组合仙人掌
+		SmallBirdRatio:    0.75, // 鸟类别内: 75% 小鸟
+		BigBirdRatio:      0.25, // 鸟类别内: 25% 大鸟
+		MinGap:            50,
+		MaxGap:            75,
+	},
+	{
+		ScoreThreshold:    1000,
+		Speed:             2.1,
+		CactusProb:        0.65, // 65% 仙人掌, 35% 鸟类
+		SingleCactusRatio: 0.40, // 仙人掌类别内: 40% 单个仙人掌
+		ShortCactusRatio:  0.20, // 仙人掌类别内: 20% 矮仙人掌
+		GroupCactusRatio:  0.40, // 仙人掌类别内: 40% 组合仙人掌
+		SmallBirdRatio:    0.70, // 鸟类别内: 70% 小鸟
+		BigBirdRatio:      0.30, // 鸟类别内: 30% 大鸟
+		MinGap:            47,
+		MaxGap:            70,
+	},
+	{
+		ScoreThreshold:    1500,
+		Speed:             2.3,
+		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
+		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
+		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
+		GroupCactusRatio:  0.50, // 仙人掌类别内: 50% 组合仙人掌
+		SmallBirdRatio:    0.65, // 鸟类别内: 65% 小鸟
+		BigBirdRatio:      0.35, // 鸟类别内: 35% 大鸟
+		MinGap:            40,
+		MaxGap:            65,
+	},
+	{
+		ScoreThreshold:    2000,
+		Speed:             2.6,
+		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
+		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
+		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
+		GroupCactusRatio:  0.50, // 仙人掌类别内: 50% 组合仙人掌
+		SmallBirdRatio:    0.65, // 鸟类别内: 65% 小鸟
+		BigBirdRatio:      0.35, // 鸟类别内: 35% 大鸟
+		MinGap:            40,
+		MaxGap:            60,
+	},
+	{
+		ScoreThreshold:    2500,
+		Speed:             2.8,
+		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
+		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
+		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
+		GroupCactusRatio:  0.50, // 仙人掌类别内: 50% 组合仙人掌
+		SmallBirdRatio:    0.65, // 鸟类别内: 65% 小鸟
+		BigBirdRatio:      0.35, // 鸟类别内: 35% 大鸟
+		MinGap:            40,
+		MaxGap:            55,
+	},
+	{
+		ScoreThreshold:    3000,
+		Speed:             3.0,
+		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
+		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
+		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
+		GroupCactusRatio:  0.50, // 仙人掌类别内: 50% 组合仙人掌
+		SmallBirdRatio:    0.65, // 鸟类别内: 65% 小鸟
+		BigBirdRatio:      0.35, // 鸟类别内: 35% 大鸟
+		MinGap:            30,
+		MaxGap:            50,
+	},
+	{
+		ScoreThreshold:    6000,
+		Speed:             3.3,
+		CactusProb:        0.60, // 60% 仙人掌, 40% 鸟类
+		SingleCactusRatio: 0.35, // 仙人掌类别内: 35% 单个仙人掌
+		ShortCactusRatio:  0.15, // 仙人掌类别内: 15% 矮仙人掌
+		GroupCactusRatio:  0.50, // 仙人掌类别内: 50% 组合仙人掌
+		SmallBirdRatio:    0.65, // 鸟类别内: 65% 小鸟
+		BigBirdRatio:      0.35, // 鸟类别内: 35% 大鸟
+		MinGap:            25,
+		MaxGap:            50,
+	},
 }
 
 // duration of smooth transition between stages
@@ -267,9 +398,6 @@ const (
 	// restart game
 	KeyRestartRune = 'r'
 )
-
-// group cactus appearance probability (default value, will be overridden by stage config)
-var groupCactusProbability = 0.25
 
 // 障碍物组合配置
 type ObstacleCombination struct {

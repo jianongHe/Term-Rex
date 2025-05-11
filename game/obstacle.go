@@ -6,16 +6,6 @@ import (
 	"math/rand"
 )
 
-// ObstacleType represents the type of obstacle
-type ObstacleType int
-
-const (
-	CactusType ObstacleType = iota
-	GroupCactusType
-	BirdType
-	BigBirdType
-)
-
 // IObstacle defines the interface for all obstacle types
 type IObstacle interface {
 	Update()
@@ -24,14 +14,16 @@ type IObstacle interface {
 	SetPosition(x float64, y int)
 	Reset()
 	GetSprite() Sprite
+	GetType() ObstacleType
 }
 
 // BaseObstacle contains common properties and methods for all obstacles
 type BaseObstacle struct {
-	posX        float64
-	y           int
-	animFrame   int
-	animCounter int
+	posX         float64
+	y            int
+	animFrame    int
+	animCounter  int
+	obstacleType ObstacleType
 }
 
 // Update moves the obstacle and updates animation
@@ -51,30 +43,36 @@ func (b *BaseObstacle) SetPosition(x float64, y int) {
 	b.y = y
 }
 
+// GetType returns the obstacle type
+func (b *BaseObstacle) GetType() ObstacleType {
+	return b.obstacleType
+}
+
 // updateAnimation advances obstacle animation frames
 func (b *BaseObstacle) updateAnimation() {
 	b.animCounter++
 	if b.animCounter >= animPeriod {
 		b.animCounter = 0
-		b.animFrame = (b.animFrame + 1) % b.getFrameCount()
+		frames := ObstacleFrames[b.obstacleType]
+		b.animFrame = (b.animFrame + 1) % len(frames)
 	}
 }
 
-// Cactus represents a cactus obstacle
+// Cactus represents a single cactus obstacle
 type Cactus struct {
 	BaseObstacle
 }
 
-// NewCactus creates a new cactus obstacle
+// NewCactus creates a new single cactus obstacle
 func NewCactus() *Cactus {
 	c := &Cactus{}
+	c.obstacleType = SingleCactusType
 	c.Reset()
 	return c
 }
 
 // Reset resets the cactus position and animation
 func (c *Cactus) Reset() {
-	// 使用有效宽度而不是实际宽度
 	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
 	c.posX = effectiveWidth
 	c.y = height - 2
@@ -84,7 +82,7 @@ func (c *Cactus) Reset() {
 
 // Draw renders the cactus on screen
 func (c *Cactus) Draw() {
-	sprite := obstacleFrames[c.animFrame]
+	sprite := ObstacleFrames[c.obstacleType][c.animFrame]
 	h := len(sprite)
 	startY := c.y - (h - 1)
 	x := int(math.Round(c.posX))
@@ -93,12 +91,43 @@ func (c *Cactus) Draw() {
 
 // GetSprite returns the current sprite for collision detection
 func (c *Cactus) GetSprite() Sprite {
-	return obstacleFrames[c.animFrame]
+	return ObstacleFrames[c.obstacleType][c.animFrame]
 }
 
-// getFrameCount returns the number of animation frames
-func (c *BaseObstacle) getFrameCount() int {
-	return len(obstacleFrames)
+// ShortCactus represents a short cactus obstacle
+type ShortCactus struct {
+	BaseObstacle
+}
+
+// NewShortCactus creates a new short cactus obstacle
+func NewShortCactus() *ShortCactus {
+	c := &ShortCactus{}
+	c.obstacleType = ShortCactusType
+	c.Reset()
+	return c
+}
+
+// Reset resets the short cactus position and animation
+func (c *ShortCactus) Reset() {
+	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+	c.posX = effectiveWidth
+	c.y = height - 2
+	c.animFrame = 0
+	c.animCounter = 0
+}
+
+// Draw renders the short cactus on screen
+func (c *ShortCactus) Draw() {
+	sprite := ObstacleFrames[c.obstacleType][c.animFrame]
+	h := len(sprite)
+	startY := c.y - (h - 1)
+	x := int(math.Round(c.posX))
+	sprite.Draw(x, startY, termbox.ColorRed, termbox.ColorDefault)
+}
+
+// GetSprite returns the current sprite for collision detection
+func (c *ShortCactus) GetSprite() Sprite {
+	return ObstacleFrames[c.obstacleType][c.animFrame]
 }
 
 // Bird represents a small bird obstacle
@@ -109,13 +138,13 @@ type Bird struct {
 // NewBird creates a new bird obstacle
 func NewBird() *Bird {
 	b := &Bird{}
+	b.obstacleType = BirdType
 	b.Reset()
 	return b
 }
 
 // Reset resets the bird position and animation
 func (b *Bird) Reset() {
-	// 使用有效宽度而不是实际宽度
 	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
 	b.posX = effectiveWidth
 	b.y = birdFlightRow
@@ -125,7 +154,7 @@ func (b *Bird) Reset() {
 
 // Draw renders the bird on screen
 func (b *Bird) Draw() {
-	sprite := birdFrames[b.animFrame]
+	sprite := ObstacleFrames[b.obstacleType][b.animFrame]
 	h := len(sprite)
 	startY := b.y - (h - 1)
 	x := int(math.Round(b.posX))
@@ -134,12 +163,7 @@ func (b *Bird) Draw() {
 
 // GetSprite returns the current sprite for collision detection
 func (b *Bird) GetSprite() Sprite {
-	return birdFrames[b.animFrame]
-}
-
-// getFrameCount returns the number of animation frames
-func (b *Bird) getFrameCount() int {
-	return len(birdFrames)
+	return ObstacleFrames[b.obstacleType][b.animFrame]
 }
 
 // BigBird represents a large bird obstacle
@@ -150,13 +174,13 @@ type BigBird struct {
 // NewBigBird creates a new big bird obstacle
 func NewBigBird() *BigBird {
 	b := &BigBird{}
+	b.obstacleType = BigBirdType
 	b.Reset()
 	return b
 }
 
 // Reset resets the big bird position and animation
 func (b *BigBird) Reset() {
-	// 使用有效宽度而不是实际宽度
 	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
 	b.posX = effectiveWidth
 	b.y = bigBirdFlightRow
@@ -166,7 +190,7 @@ func (b *BigBird) Reset() {
 
 // Draw renders the big bird on screen
 func (b *BigBird) Draw() {
-	sprite := bigBirdFrames[b.animFrame]
+	sprite := ObstacleFrames[b.obstacleType][b.animFrame]
 	h := len(sprite)
 	startY := b.y - (h - 1)
 	x := int(math.Round(b.posX))
@@ -175,12 +199,43 @@ func (b *BigBird) Draw() {
 
 // GetSprite returns the current sprite for collision detection
 func (b *BigBird) GetSprite() Sprite {
-	return bigBirdFrames[b.animFrame]
+	return ObstacleFrames[b.obstacleType][b.animFrame]
 }
 
-// getFrameCount returns the number of animation frames
-func (b *BigBird) getFrameCount() int {
-	return len(bigBirdFrames)
+// GroupCactus represents a group of connected cacti obstacle
+type GroupCactus struct {
+	BaseObstacle
+}
+
+// NewGroupCactus creates a new group cactus obstacle
+func NewGroupCactus() *GroupCactus {
+	c := &GroupCactus{}
+	c.obstacleType = GroupCactusType
+	c.Reset()
+	return c
+}
+
+// Reset resets the group cactus position and animation
+func (c *GroupCactus) Reset() {
+	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
+	c.posX = effectiveWidth
+	c.y = height - 2
+	c.animFrame = 0
+	c.animCounter = 0
+}
+
+// Draw renders the group cactus on screen
+func (c *GroupCactus) Draw() {
+	sprite := ObstacleFrames[c.obstacleType][c.animFrame]
+	h := len(sprite)
+	startY := c.y - (h - 1)
+	x := int(math.Round(c.posX))
+	sprite.Draw(x, startY, termbox.ColorRed, termbox.ColorDefault)
+}
+
+// GetSprite returns the current sprite for collision detection
+func (c *GroupCactus) GetSprite() Sprite {
+	return ObstacleFrames[c.obstacleType][c.animFrame]
 }
 
 // ObstacleManager manages the creation and updating of obstacles
@@ -190,17 +245,37 @@ type ObstacleManager struct {
 	minGap       int         // 当前阶段的最小间距
 	maxGap       int         // 当前阶段的最大间距
 	currentStage int         // 当前游戏阶段
+
+	// 概率配置
+	cactusProbability float64 // 仙人掌类别的总概率
+	singleCactusRatio float64 // 单个仙人掌在仙人掌类别中的占比
+	shortCactusRatio  float64 // 矮仙人掌在仙人掌类别中的占比
+	groupCactusRatio  float64 // 组合仙人掌在仙人掌类别中的占比
+	smallBirdRatio    float64 // 小鸟在鸟类别中的占比
+	bigBirdRatio      float64 // 大鸟在鸟类别中的占比
 }
 
 // NewObstacleManager creates a new obstacle manager
 func NewObstacleManager() *ObstacleManager {
+	// 获取初始阶段的配置
+	initialStage := stageConfigs[0]
+
 	om := &ObstacleManager{
 		obstacles:    make([]IObstacle, 0, 5), // 预分配5个障碍物的空间
-		minGap:       stageConfigs[0].MinGap,
-		maxGap:       stageConfigs[0].MaxGap,
+		minGap:       initialStage.MinGap,
+		maxGap:       initialStage.MaxGap,
 		nextGapTimer: 0,
 		currentStage: 0,
+
+		// 设置初始概率
+		cactusProbability: initialStage.CactusProb,
+		singleCactusRatio: initialStage.SingleCactusRatio,
+		shortCactusRatio:  initialStage.ShortCactusRatio,
+		groupCactusRatio:  initialStage.GroupCactusRatio,
+		smallBirdRatio:    initialStage.SmallBirdRatio,
+		bigBirdRatio:      initialStage.BigBirdRatio,
 	}
+
 	// 生成第一个障碍物
 	om.generateNewObstacle()
 	return om
@@ -257,11 +332,22 @@ func (om *ObstacleManager) Update() {
 	}
 }
 
-// UpdateStageGaps updates the gap parameters based on current stage
+// UpdateStageGaps updates the gap parameters and probabilities based on current stage
 func (om *ObstacleManager) UpdateStageGaps(minGap, maxGap int, stageIndex int) {
 	om.minGap = minGap
 	om.maxGap = maxGap
 	om.currentStage = stageIndex
+
+	// 更新所有概率配置
+	if stageIndex < len(stageConfigs) {
+		stageConfig := stageConfigs[stageIndex]
+		om.cactusProbability = stageConfig.CactusProb
+		om.singleCactusRatio = stageConfig.SingleCactusRatio
+		om.shortCactusRatio = stageConfig.ShortCactusRatio
+		om.groupCactusRatio = stageConfig.GroupCactusRatio
+		om.smallBirdRatio = stageConfig.SmallBirdRatio
+		om.bigBirdRatio = stageConfig.BigBirdRatio
+	}
 }
 
 // Draw renders all obstacles
@@ -280,16 +366,36 @@ func (om *ObstacleManager) GetObstacles() []IObstacle {
 func (om *ObstacleManager) generateNewObstacle() {
 	var newObstacle IObstacle
 
-	// Select obstacle type based on probabilities
+	// 第一层概率：决定是仙人掌还是鸟类
 	r := rand.Float64()
-	if r < bigBirdProbability {
-		newObstacle = NewBigBird()
-	} else if r < bigBirdProbability+birdProbability {
-		newObstacle = NewBird()
-	} else if r < bigBirdProbability+birdProbability+groupCactusProbability {
-		newObstacle = NewGroupCactus()
+
+	if r < om.cactusProbability {
+		// 选择了仙人掌类别
+		// 第二层概率：决定是哪种仙人掌
+		cactusTypeRoll := rand.Float64()
+
+		// 计算累积概率
+		shortCactusCumulProb := om.shortCactusRatio
+		groupCactusCumulProb := shortCactusCumulProb + om.groupCactusRatio
+		// 单个仙人掌占剩余概率 (1.0 - shortCactusRatio - groupCactusRatio)
+
+		if cactusTypeRoll < shortCactusCumulProb {
+			newObstacle = NewShortCactus()
+		} else if cactusTypeRoll < groupCactusCumulProb {
+			newObstacle = NewGroupCactus()
+		} else {
+			newObstacle = NewCactus()
+		}
 	} else {
-		newObstacle = NewCactus()
+		// 选择了鸟类别
+		// 第二层概率：决定是小鸟还是大鸟
+		birdTypeRoll := rand.Float64()
+
+		if birdTypeRoll < om.smallBirdRatio {
+			newObstacle = NewBird()
+		} else {
+			newObstacle = NewBigBird()
+		}
 	}
 
 	// Add to obstacle list
@@ -299,7 +405,6 @@ func (om *ObstacleManager) generateNewObstacle() {
 	// The gap is measured in frames (how many update cycles before generating the next obstacle)
 
 	// Base gap multiplier - higher value means larger gaps between obstacles
-	// Increasing from 0.5 to 0.8 to make obstacles less frequent
 	var gapMultiplier float64 = 0.8
 
 	// Adjust gap based on screen width
@@ -329,45 +434,4 @@ func (om *ObstacleManager) generateNewObstacle() {
 
 	// Set timer for next obstacle generation
 	om.nextGapTimer = finalGap
-}
-
-// GroupCactus represents a group of connected cacti obstacle
-type GroupCactus struct {
-	BaseObstacle
-}
-
-// NewGroupCactus creates a new group cactus obstacle
-func NewGroupCactus() *GroupCactus {
-	c := &GroupCactus{}
-	c.Reset()
-	return c
-}
-
-// Reset resets the group cactus position and animation
-func (c *GroupCactus) Reset() {
-	// 使用有效宽度而不是实际宽度
-	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
-	c.posX = effectiveWidth
-	c.y = height - 2
-	c.animFrame = 0
-	c.animCounter = 0
-}
-
-// Draw renders the group cactus on screen
-func (c *GroupCactus) Draw() {
-	sprite := groupCactusFrames[c.animFrame]
-	h := len(sprite)
-	startY := c.y - (h - 1)
-	x := int(math.Round(c.posX))
-	sprite.Draw(x, startY, termbox.ColorRed, termbox.ColorDefault)
-}
-
-// GetSprite returns the current sprite for collision detection
-func (c *GroupCactus) GetSprite() Sprite {
-	return groupCactusFrames[c.animFrame]
-}
-
-// getFrameCount returns the number of animation frames
-func (c *GroupCactus) getFrameCount() int {
-	return len(groupCactusFrames)
 }

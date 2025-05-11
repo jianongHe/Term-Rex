@@ -35,12 +35,11 @@ func (g *Game) applyStage() {
 		if frac >= 1 {
 			// finish transition
 			g.stageIndexActive = g.stageIndexTarget
-			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed * speedFactor
-			birdProbability = stageConfigs[g.stageIndexActive].BirdProb
-			bigBirdProbability = stageConfigs[g.stageIndexActive].BigBirdProb
-			groupCactusProbability = stageConfigs[g.stageIndexActive].GroupCactusProb
 
-			// 更新障碍物间距
+			// 设置当前阶段的速度
+			obstacleSpeed = stageConfigs[g.stageIndexActive].Speed * speedFactor
+
+			// 更新障碍物间距和概率
 			g.obstacleManager.UpdateStageGaps(
 				stageConfigs[g.stageIndexActive].MinGap,
 				stageConfigs[g.stageIndexActive].MaxGap,
@@ -52,25 +51,49 @@ func (g *Game) applyStage() {
 			// interpolate between active and target
 			old := stageConfigs[g.stageIndexActive]
 			next := stageConfigs[g.stageIndexTarget]
+
+			// 平滑过渡速度
 			speed := old.Speed + frac*(next.Speed-old.Speed)
 			obstacleSpeed = speed * speedFactor
-			birdProbability = old.BirdProb + frac*(next.BirdProb-old.BirdProb)
-			bigBirdProbability = old.BigBirdProb + frac*(next.BigBirdProb-old.BigBirdProb)
-			groupCactusProbability = old.GroupCactusProb + frac*(next.GroupCactusProb-old.GroupCactusProb)
 
 			// 平滑过渡障碍物间距
 			minGap := int(float64(old.MinGap) + frac*float64(next.MinGap-old.MinGap))
 			maxGap := int(float64(old.MaxGap) + frac*float64(next.MaxGap-old.MaxGap))
-			stageIndex := g.stageIndexActive // 在过渡期间使用当前活动阶段
-			g.obstacleManager.UpdateStageGaps(minGap, maxGap, stageIndex)
+
+			// 平滑过渡概率
+			cactusProbability := old.CactusProb + frac*(next.CactusProb-old.CactusProb)
+			singleCactusRatio := old.SingleCactusRatio + frac*(next.SingleCactusRatio-old.SingleCactusRatio)
+			shortCactusRatio := old.ShortCactusRatio + frac*(next.ShortCactusRatio-old.ShortCactusRatio)
+			groupCactusRatio := old.GroupCactusRatio + frac*(next.GroupCactusRatio-old.GroupCactusRatio)
+			smallBirdRatio := old.SmallBirdRatio + frac*(next.SmallBirdRatio-old.SmallBirdRatio)
+			bigBirdRatio := old.BigBirdRatio + frac*(next.BigBirdRatio-old.BigBirdRatio)
+
+			// 创建临时阶段配置
+			tempStage := StageConfig{
+				CactusProb:        cactusProbability,
+				SingleCactusRatio: singleCactusRatio,
+				ShortCactusRatio:  shortCactusRatio,
+				GroupCactusRatio:  groupCactusRatio,
+				SmallBirdRatio:    smallBirdRatio,
+				BigBirdRatio:      bigBirdRatio,
+			}
+
+			// 更新障碍物管理器的概率
+			g.obstacleManager.cactusProbability = tempStage.CactusProb
+			g.obstacleManager.singleCactusRatio = tempStage.SingleCactusRatio
+			g.obstacleManager.shortCactusRatio = tempStage.ShortCactusRatio
+			g.obstacleManager.groupCactusRatio = tempStage.GroupCactusRatio
+			g.obstacleManager.smallBirdRatio = tempStage.SmallBirdRatio
+			g.obstacleManager.bigBirdRatio = tempStage.BigBirdRatio
+
+			// 更新障碍物间距
+			g.obstacleManager.minGap = minGap
+			g.obstacleManager.maxGap = maxGap
 		}
 	} else {
 		// no transition: keep active stage values
 		sc := stageConfigs[g.stageIndexActive]
 		obstacleSpeed = sc.Speed * speedFactor
-		birdProbability = sc.BirdProb
-		bigBirdProbability = sc.BigBirdProb
-		groupCactusProbability = sc.GroupCactusProb
 
 		// 确保障碍物间距与当前阶段一致
 		g.obstacleManager.UpdateStageGaps(sc.MinGap, sc.MaxGap, g.stageIndexActive)
