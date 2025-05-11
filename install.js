@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const version= '0.1.7';
+const version= '0.1.8';
 
 // Determine platform and architecture
 const platform = os.platform();

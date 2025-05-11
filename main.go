@@ -12,7 +12,7 @@ import (
 
 // Version information - this should match version.js
 const (
-	Version   = "0.1.7"
+	Version   = "0.1.8"
 	BuildDate = "2025-05-11"
 )
 
