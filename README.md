@@ -1,31 +1,15 @@
-# Term-Rex: Command-Line Dino Runner
+# Term-Rex: Dino Runner Game but in terminal
 
 [![Release](https://img.shields.io/github/v/release/jianongHe/term-rex)](https://github.com/jianongHe/term-rex/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jianongHe/term-rex)](https://goreportcard.com/report/github.com/jianongHe/term-rex)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+
+![Term-Rex Banner](./assets/Term-Rex-Banner.jpg)
+
 A terminal-based dinosaur runner game inspired by the Chrome offline game, implemented in Golang using the termbox-go library.
 
 ![Term-Rex Game Demo](./assets/demo.gif)
-
-```
-Score: 111  (Q to quit)                                               High: 6062
-          .--.                        .--.                                      
-      .-(    )-.                  .-(    )-.                                    
-      (________)                  (________)                          .--.      
-                                                                  .-(    )-.        
-                                                                  (________)         
-           ++++                                                                        
-    ++    ++Q++                                        /                             
-     + +++++  +                                       <o=-                          
-      ++++++                                           \                          
-       |   |   
-                    |                                                       |       
-                \|/\|/                                                     \|/       
-                 |  |                                                       |       
-________________________________________________________________________________
-   ` , -  '    `     '     `     `    -    ..   .   .    '  -  ` `    -  ` ' '  
-```
 
 ## Installation
 
@@ -33,7 +17,7 @@ ________________________________________________________________________________
 
 ```bash
 # Install with Homebrew
-brew install jianongHe/tap/term-rex
+brew install jianongHe/tap/term-rexm
 # Start Play
 term-rex
 ```
@@ -68,7 +52,6 @@ Or you can directly clone this repo and `go run main.go`
 | <kbd>Space</kbd> / <kbd>↑</kbd> | Jump |
 | <kbd>↓</kbd>                    | Duck |
 | <kbd>P</kbd>                    | Pause/Resume |
-| <kbd>M</kbd>                    | Toggle sound |
 | <kbd>R</kbd>                    | Restart (after game over) |
 | <kbd>Q</kbd> / <kbd>Esc</kbd>   | Quit |
 
