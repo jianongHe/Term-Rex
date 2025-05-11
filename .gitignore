@@ -1,14 +1,32 @@
-# IDE files
-.idea/
-*.iml
-*.iws
-*.ipr
-*.iws
-.idea_modules/
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
 
-# Other common files to ignore
-__pycache__/
-*.py[cod]
-*$py.class
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# macOS specific files
 .DS_Store
-bin
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# GoReleaser
+dist/

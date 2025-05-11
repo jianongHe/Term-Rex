@@ -77,7 +77,7 @@ func NewGame() *Game {
 		cloudManager:             NewCloudManager(),
 		ticker:                   time.NewTicker(tickDuration),
 		events:                   events,
-		score:                    3000,
+		score:                    0,
 		highestScore:             highScore,
 		groundStart:              gs,
 		groundEnd:                ge,
@@ -167,11 +167,11 @@ func (g *Game) draw() {
 	}
 
 	// 显示音效状态
-	soundStatus := "Sound: ON (m)"
-	if !GetAudioManager().IsEnabled() {
-		soundStatus = "Sound: OFF (m)"
-	}
-	PrintAt(width/2-len(soundStatus)/2, 0, soundStatus)
+	//soundStatus := "Sound: ON (m)"
+	//if !GetAudioManager().IsEnabled() {
+	//	soundStatus = "Sound: OFF (m)"
+	//}
+	//PrintAt(width/2-len(soundStatus)/2, 0, soundStatus)
 
 	// 始终显示最高分，即使是0
 	hsText := fmt.Sprintf("High: %d", g.highestScore)

@@ -1,5 +1,9 @@
 # Term-Rex: Command-Line Dino Runner
 
+[![Release](https://img.shields.io/github/v/release/jianongHe/term-rex)](https://github.com/jianongHe/term-rex/releases/latest)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jianongHe/term-rex)](https://goreportcard.com/report/github.com/jianongHe/term-rex)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A terminal-based dinosaur runner game inspired by the Chrome offline game, implemented in Golang using the termbox-go library.
 
 ## Game Features
@@ -36,15 +40,45 @@ A terminal-based dinosaur runner game inspired by the Chrome offline game, imple
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/Term-Rex.git
-cd Term-Rex
+### Homebrew (macOS and Linux)
 
-# Install dependencies
-go get github.com/nsf/termbox-go
-go get github.com/faiface/beep
+```bash
+brew tap jianongHe/tap
+brew install term-rex
 ```
+
+### Scoop (Windows)
+
+```powershell
+scoop bucket add jianongHe https://github.com/jianongHe/scoop-bucket.git
+scoop install term-rex
+```
+
+### Manual Installation
+
+Download the appropriate binary for your system from the [releases page](https://github.com/jianongHe/term-rex/releases/latest).
+
+#### Linux/macOS
+
+```bash
+# Download the latest release (replace X.Y.Z with the version number)
+curl -L https://github.com/jianongHe/term-rex/releases/download/vX.Y.Z/term-rex_X.Y.Z_linux_amd64.tar.gz -o term-rex.tar.gz
+
+# Extract the binary
+tar -xzf term-rex.tar.gz
+
+# Make it executable
+chmod +x term-rex
+
+# Move to a directory in your PATH (optional)
+sudo mv term-rex /usr/local/bin/
+```
+
+#### Windows
+
+1. Download the ZIP file from the releases page
+2. Extract the ZIP file
+3. Run the executable from the command prompt or PowerShell
 
 ## How to Run
 

@@ -5,125 +5,31 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            output_name: term-rex-linux
-          - os: macos-latest
-            output_name: term-rex-macos
-          - os: windows-latest
-            output_name: term-rex-windows.exe
-    
+  goreleaser:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: '>=1.22.0'
+          cache: true
       
-      - name: Install dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libasound2-dev
-      
-      - name: Build binary
-        run: go build -o ${{ matrix.output_name }} main.go
-      
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v4
         with:
-          name: ${{ matrix.output_name }}
-          path: ${{ matrix.output_name }}
-  
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      
-      - name: Download all artifacts
-        uses: actions/download-artifact@v2
-      
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+          distribution: goreleaser
+          version: latest
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      
-      - name: Upload Linux Binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./term-rex-linux/term-rex-linux
-          asset_name: term-rex-linux
-          asset_content_type: application/octet-stream
-      
-      - name: Upload macOS Binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./term-rex-macos/term-rex-macos
-          asset_name: term-rex-macos
-          asset_content_type: application/octet-stream
-      
-      - name: Upload Windows Binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./term-rex-windows.exe/term-rex-windows.exe
-          asset_name: term-rex-windows.exe
-          asset_content_type: application/octet-stream
-  
-  docker:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: term-rex-linux
-          path: bin/
-      
-      - name: Rename binary
-        run: |
-          chmod +x bin/term-rex-linux
-          mv bin/term-rex-linux bin/term-rex
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: jianonghe/term-rex:latest,jianonghe/term-rex:${{ github.ref_name }}
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
