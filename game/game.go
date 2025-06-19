@@ -65,6 +65,10 @@ func NewGame() *Game {
 	// Initialize ground decorations
 	InitGroundDecorations()
 
+	// Initialize audio manager
+	audioManager := GetAudioManager()
+	audioManager.Initialize()
+
 	// 加载历史最高分
 	highScore, err := LoadHighScore()
 	if err != nil {
@@ -113,11 +117,11 @@ func (g *Game) drawStartScreen() {
 	PrintCenter("Press Space or Up Arrow to Start")
 
 	// 显示音效控制提示
-	//soundMsg := "Press 'm' to toggle sound"
-	//if !GetAudioManager().IsEnabled() {
-	//	soundMsg = "Sound OFF - Press 'm' to enable"
-	//}
-	//PrintCenterAt(soundMsg, height/2+2)
+	soundMsg := "Press 'm' to toggle sound"
+	if !GetAudioManager().IsEnabled() {
+		soundMsg = "Sound OFF - Press 'm' to enable"
+	}
+	PrintCenterAt(soundMsg, height/2+2)
 }
 
 // drawGameScene renders the full game scene after start
