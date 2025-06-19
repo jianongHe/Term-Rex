@@ -143,11 +143,14 @@ func NewBird() *Bird {
 	return b
 }
 
-// Reset resets the bird position and animation
+// Reset resets the bird position and animation with random height
 func (b *Bird) Reset() {
 	effectiveWidth := math.Min(float64(width), float64(maxEffectiveWidth))
 	b.posX = effectiveWidth
-	b.y = birdFlightRow
+
+	// Randomly select one of the available flight heights
+	b.y = birdFlightRows[rand.Intn(len(birdFlightRows))]
+
 	b.animFrame = 0
 	b.animCounter = 0
 }

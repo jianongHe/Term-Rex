@@ -198,8 +198,12 @@ var cloudSprites = []Sprite{
 	},
 }
 
-// bird flight height (row index) above bottom of screen
-const birdFlightRow = 9
+// bird flight heights (row index) above bottom of screen
+// Small birds can appear at two different heights for variety
+var birdFlightRows = []int{
+	12, // High position - requires ducking
+	9,  // Low position - requires jumping
+}
 
 // big bird flight height (row index) above bottom of screen
 const bigBirdFlightRow = 7
